@@ -15,7 +15,7 @@ import { IActiveUser } from 'src/common/interfaces/active-user.interface';
 import { RoleGuard } from './guards/role.guard';
 import { AuthService } from './auth.service';
 
-@ApiTags('Auth')
+@ApiTags('Autenticación')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
