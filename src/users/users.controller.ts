@@ -1,34 +1,115 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseUUIDPipe,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { User } from './entities/user.entity';
+import { Auth } from 'src/auth/decorators/auth.decorator';
+import { Role } from 'src/common/enums/role.enum';
 
-@Controller('users')
+@Auth(Role.Admin)
+@ApiBearerAuth()
+@ApiTags('Usuarios')
+@Controller('usuarios')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
-  }
-
+  /**
+   * @summary Obtener todos los usuarios
+   * @description Recupera una lista de todos los usuarios.
+   * @returns Lista de usuarios recuperada exitosamente.
+   */
   @Get()
+  @ApiOperation({
+    summary: 'Obtener todos los usuarios',
+    description: 'Recupera una lista de todos los usuarios.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de usuarios recuperada exitosamente.',
+    type: User,
+    isArray: true,
+  })
   findAll() {
     return this.usersService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+  /**
+   * @summary Buscar un usuario por término
+   * @description Recupera un usuario por término (nombre de usuario, correo electrónico o ID).
+   * @param term Término de búsqueda (correo electrónico o ID del usuario).
+   * @returns Usuario recuperado exitosamente.
+   */
+  @Get(':term')
+  @ApiOperation({
+    summary: 'Buscar un usuario por término',
+    description:
+      'Recupera un usuario por término (nombre de usuario, correo electrónico o ID).',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Usuario recuperado exitosamente.',
+    type: User,
+  })
+  @ApiResponse({ status: 404, description: 'Usuario no encontrado' })
+  @ApiParam({
+    name: 'term',
+    description: 'Correo electrónico o ID del usuario',
+  })
+  findOne(@Param('term') term: string) {
+    return this.usersService.findOne(term);
   }
 
+  /**
+   * @summary Actualizar un usuario por ID
+   * @description Actualiza un usuario por ID.
+   * @param id ID del usuario a actualizar.
+   * @param updatePersonDto Datos actualizados del usuario.
+   * @returns El usuario ha sido actualizado exitosamente.
+   */
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+  @ApiOperation({ summary: 'Actualizar un usuario por ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'El usuario ha sido actualizado exitosamente.',
+  })
+  @ApiResponse({ status: 400, description: 'Solicitud incorrecta' })
+  @ApiResponse({ status: 404, description: 'Usuario no encontrado' })
+  update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() updatePersonDto: UpdateUserDto,
+  ) {
+    return this.usersService.update(id, updatePersonDto);
   }
 
+  /**
+   * @summary Eliminar un usuario por ID
+   * @description Elimina un usuario por ID.
+   * @param id ID del usuario a eliminar.
+   * @returns El usuario ha sido eliminado exitosamente.
+   */
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  @ApiOperation({ summary: 'Eliminar un usuario por ID' })
+  @ApiResponse({
+    status: 204,
+    description: 'El usuario ha sido eliminado exitosamente.',
+  })
+  @ApiResponse({ status: 400, description: 'Solicitud incorrecta' })
+  @ApiResponse({ status: 404, description: 'Usuario no encontrado' })
+  remove(@Param('id', ParseUUIDPipe) id: string) {
+    return this.usersService.remove(id);
   }
 }
