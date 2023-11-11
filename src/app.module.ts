@@ -18,6 +18,7 @@ import { AssignVehiclesModule } from './assign-vehicles/assign-vehicles.module';
 import { EmployeesOfficesModule } from './employees-offices/employees-offices.module';
 import { EmployeesDriversModule } from './employees-drivers/employees-drivers.module';
 import { EmployeesChiefsModule } from './employees-chiefs/employees-chiefs.module';
+import { PassengersModule } from './passengers/passengers.module';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { EmployeesChiefsModule } from './employees-chiefs/employees-chiefs.modul
     EmployeesOfficesModule,
     EmployeesDriversModule,
     EmployeesChiefsModule,
+    PassengersModule,
   ],
   controllers: [],
   providers: [],
