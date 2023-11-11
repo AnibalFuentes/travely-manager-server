@@ -8,6 +8,16 @@ import { CustomersModule } from './customers/customers.module';
 import { VehiclesModule } from './vehicles/vehicles.module';
 import { EmployeesModule } from './employees/employees.module';
 import { BrandsModule } from './brands/brands.module';
+import { LocationsModule } from './locations/locations.module';
+import { OfficesModule } from './offices/offices.module';
+import { CompaniesModule } from './companies/companies.module';
+import { PeopleModule } from './people/people.module';
+import { SalesModule } from './sales/sales.module';
+import { SalesOrdersModule } from './sales-orders/sales-orders.module';
+import { AssignVehiclesModule } from './assign-vehicles/assign-vehicles.module';
+import { EmployeesOfficesModule } from './employees-offices/employees-offices.module';
+import { EmployeesDriversModule } from './employees-drivers/employees-drivers.module';
+import { EmployeesChiefsModule } from './employees-chiefs/employees-chiefs.module';
 
 @Module({
   imports: [
@@ -29,6 +39,16 @@ import { BrandsModule } from './brands/brands.module';
     VehiclesModule,
     EmployeesModule,
     BrandsModule,
+    LocationsModule,
+    OfficesModule,
+    CompaniesModule,
+    PeopleModule,
+    SalesModule,
+    SalesOrdersModule,
+    AssignVehiclesModule,
+    EmployeesOfficesModule,
+    EmployeesDriversModule,
+    EmployeesChiefsModule,
   ],
   controllers: [],
   providers: [],
