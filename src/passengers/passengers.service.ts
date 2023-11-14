@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, InternalServerErrorException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import { CreatePassengerDto } from './dto/create-passenger.dto';
 import { UpdatePassengerDto } from './dto/update-passenger.dto';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
@@ -13,12 +18,12 @@ export class PassengersService {
 
   constructor(
     @InjectRepository(Passenger)
-    private readonly customerRepository: Repository<Passenger>,
+    private readonly passengerRepository: Repository<Passenger>,
     private readonly personsService: PeopleService,
   ) {}
 
   private async getPassengerById(id: string): Promise<Passenger> {
-    const passenger = await this.customerRepository
+    const passenger = await this.passengerRepository
       .createQueryBuilder('passenger')
       .leftJoinAndSelect('passenger.person', 'person')
       .where('passenger.id = :id', { id })
@@ -27,56 +32,95 @@ export class PassengersService {
     return passenger;
   }
 
-  async create(createPassengerDto: CreatePassengerDto) {
-
+  /**
+   * @summary Crear un nuevo pasajero
+   * @description Crea un nuevo pasajero.
+   * @param createPassengerDto Datos para crear el pasajero.
+   * @returns Pasajero creado exitosamente.
+   * @throws NotFoundException Si no se encuentra la persona asociada.
+   * @throws InternalServerErrorException Si ocurre un error inesperado.
+   */
+  async create(createPassengerDto: CreatePassengerDto): Promise<Passenger> {
     const createPersonDto = createPassengerDto.person;
 
     try {
       const person = await this.personsService.create(createPersonDto);
 
-      const passenger = this.customerRepository.create({
+      const passenger = this.passengerRepository.create({
         person: person,
       });
 
-      await this.customerRepository.save(passenger);
+      await this.passengerRepository.save(passenger);
       return passenger;
     } catch (error) {
       this.handleExceptions(error);
     }
   }
 
-  async findAll(paginationDto: PaginationDto) {
+  /**
+   * @summary Obtener una lista de pasajeros paginada
+   * @description Obtiene una lista paginada de pasajeros.
+   * @param paginationDto Datos de paginación.
+   * @returns Lista de pasajeros paginada y detalles de paginación.
+   */
+  async findAll(
+    paginationDto: PaginationDto,
+  ): Promise<{
+    passengers: Passenger[];
+    total: number;
+    limit: number;
+    offset: number;
+  }> {
     const { limit = 10, offset = 0 } = paginationDto || {};
 
-    const [passengerss, total] = await this.customerRepository.findAndCount({
+    const [passengers, total] = await this.passengerRepository.findAndCount({
       relations: ['person'],
       take: limit,
       skip: offset,
     });
 
     return {
-      customers: passengerss,
+      passengers: passengers,
       total,
       limit,
       offset,
     };
   }
 
-  async findOne(id: string) {
+  /**
+   * @summary Obtener un pasajero por ID
+   * @description Obtiene un pasajero por su ID.
+   * @param id ID del pasajero (UUID).
+   * @returns Pasajero recuperado por ID exitosamente.
+   * @throws NotFoundException Si el pasajero no se encuentra.
+   */
+  async findOne(id: string): Promise<Passenger> {
     const passenger = await this.getPassengerById(id);
 
     if (!passenger) {
-      throw new NotFoundException(`Passenger with ID ${id} not found`);
+      throw new NotFoundException(`Pasajero con ID ${id} no encontrado`);
     }
 
     return passenger;
   }
 
-  async update(id: string, updatePassengerDto: UpdatePassengerDto) {
+  /**
+   * @summary Actualizar un pasajero por ID
+   * @description Actualiza un pasajero por su ID.
+   * @param id ID del pasajero (UUID).
+   * @param updatePassengerDto Datos para actualizar el pasajero.
+   * @returns Pasajero actualizado por ID exitosamente.
+   * @throws NotFoundException Si el pasajero no se encuentra.
+   * @throws InternalServerErrorException Si ocurre un error inesperado al guardar.
+   */
+  async update(
+    id: string,
+    updatePassengerDto: UpdatePassengerDto,
+  ): Promise<Passenger> {
     const passenger = await this.getPassengerById(id);
 
     if (!passenger) {
-      throw new NotFoundException(`Passenger with ID ${id} not found`);
+      throw new NotFoundException(`Pasajero con ID ${id} no encontrado`);
     }
 
     if (updatePassengerDto.person) {
@@ -85,22 +129,29 @@ export class PassengersService {
     }
 
     try {
-      await this.customerRepository.save(passenger);
+      await this.passengerRepository.save(passenger);
       return passenger;
     } catch (error) {
       this.handleExceptions(error);
     }
   }
 
-  async remove(id: string) {
+  /**
+   * @summary Eliminar un pasajero por ID
+   * @description Elimina un pasajero por su ID.
+   * @param id ID del pasajero (UUID).
+   * @throws NotFoundException Si el pasajero no se encuentra.
+   * @throws InternalServerErrorException Si ocurre un error inesperado al eliminar.
+   */
+  async remove(id: string): Promise<void> {
     const passenger = await this.getPassengerById(id);
 
     if (!passenger) {
-      throw new NotFoundException(`Passenger with ID ${id} not found`);
+      throw new NotFoundException(`Pasajero con ID ${id} no encontrado`);
     }
 
     try {
-      await this.customerRepository.remove(passenger);
+      await this.passengerRepository.remove(passenger);
       await this.personsService.remove(passenger.person.id);
     } catch (error) {
       this.handleExceptions(error);
@@ -111,7 +162,7 @@ export class PassengersService {
     this.logger.error(error);
 
     throw new InternalServerErrorException(
-      'An unexpected error occurred. Please check server logs.',
+      'Se produjo un error inesperado. Por favor, revise los registros del servidor.',
     );
   }
 }

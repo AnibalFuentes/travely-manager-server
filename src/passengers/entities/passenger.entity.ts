@@ -1,6 +1,13 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { Person } from "src/people/entities/person.entity";
-import { Column, CreateDateColumn, JoinColumn, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { ApiProperty } from '@nestjs/swagger';
+import { Person } from 'src/people/entities/person.entity';
+import {
+  Column,
+  CreateDateColumn,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 export class Passenger {
   @PrimaryGeneratedColumn('uuid')
