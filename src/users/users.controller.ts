@@ -23,7 +23,7 @@ import { Role } from 'src/common/enums/role.enum';
 @Auth(Role.Admin)
 @ApiBearerAuth()
 @ApiTags('Usuarios')
-@Controller('usuarios')
+@Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 

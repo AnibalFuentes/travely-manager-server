@@ -11,7 +11,7 @@ import { Role } from 'src/common/enums';
 @Auth(Role.User)
 @ApiBearerAuth()
 @ApiTags('Personas')
-@Controller('personas')
+@Controller('persons')
 export class PeopleController {
   constructor(private readonly peopleService: PeopleService) {}
 
