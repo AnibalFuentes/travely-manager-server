@@ -1,7 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { DocumentType, Gender } from 'src/common/enums/index';
-import { Column, CreateDateColumn, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
+@Entity()
 export class Person {
   @PrimaryGeneratedColumn('uuid')
   @ApiProperty({
@@ -26,7 +32,8 @@ export class Person {
     nullable: true,
   })
   @ApiProperty({
-    description: 'Tipo de documento: CedulaCiudadania, CedulaExtranjeria, Pasaporte, etc.',
+    description:
+      'Tipo de documento: CedulaCiudadania, CedulaExtranjeria, Pasaporte, etc.',
     enum: DocumentType,
     enumName: 'DocumentType',
   })

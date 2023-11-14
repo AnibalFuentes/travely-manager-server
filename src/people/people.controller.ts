@@ -1,8 +1,24 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseUUIDPipe,
+} from '@nestjs/common';
 import { PeopleService } from './people.service';
 import { CreatePersonDto } from './dto/create-person.dto';
 import { UpdatePersonDto } from './dto/update-person.dto';
-import { ApiBearerAuth, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Person } from './entities/person.entity';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
 import { Auth } from 'src/auth/decorators/auth.decorator';
@@ -45,7 +61,8 @@ export class PeopleController {
   @Get()
   @ApiOperation({
     summary: 'Obtener una lista de personas con paginación',
-    description: 'Recupera una lista paginada de entidades de persona en el sistema.',
+    description:
+      'Recupera una lista paginada de entidades de persona en el sistema.',
   })
   @ApiResponse({
     status: 200,
@@ -77,11 +94,13 @@ export class PeopleController {
   @Get(':term')
   @ApiOperation({
     summary: 'Encontrar una persona por ID o término de búsqueda',
-    description: 'Encuentra una entidad de persona por su ID único o un término de búsqueda.',
+    description:
+      'Encuentra una entidad de persona por su ID único o un término de búsqueda.',
   })
   @ApiParam({
     name: 'term',
-    description: 'nombre, número de identificación, correo electrónico o ID de la persona',
+    description:
+      'nombre, número de identificación, correo electrónico o ID de la persona',
   })
   @ApiResponse({ status: 200, description: 'Persona encontrada exitosamente.' })
   @ApiResponse({ status: 400, description: 'Solicitud incorrecta' })
