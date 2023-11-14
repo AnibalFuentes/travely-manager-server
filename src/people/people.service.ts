@@ -1,11 +1,17 @@
-import { Injectable, Logger,ConflictException, NotFoundException, InternalServerErrorException } from '@nestjs/common';
-import { CreatePersonDto } from './dto/create-person.dto';
-import { UpdatePersonDto } from './dto/update-person.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Person } from './entities/person.entity';
-import { Repository } from 'typeorm';
-import { PaginationDto } from 'src/common/dtos/pagination.dto';
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { validate as isUUID } from 'uuid';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { CreatePersonDto } from './dto/create-person.dto';
+import { PaginationDto } from 'src/common/dtos/pagination.dto';
+import { UpdatePersonDto } from './dto/update-person.dto';
+import { Person } from './entities/person.entity';
 
 @Injectable()
 export class PeopleService {
@@ -17,8 +23,7 @@ export class PeopleService {
   ) {}
 
   async create(createPersonDto: CreatePersonDto) {
-    const { identificationNumber, email, mobilePhone } =
-      createPersonDto;
+    const { identificationNumber, email, mobilePhone } = createPersonDto;
 
     const existingPersonWithIdentificationNumber =
       await this.personRepository.findOne({
@@ -27,7 +32,7 @@ export class PeopleService {
 
     if (existingPersonWithIdentificationNumber) {
       throw new ConflictException(
-        'A person with the same identification number already exists.',
+        'Ya existe una persona con el mismo número de identificación.',
       );
     }
 
@@ -37,7 +42,7 @@ export class PeopleService {
 
     if (existingPersonWithEmail) {
       throw new ConflictException(
-        'A person with the same email address already exists.',
+        'Ya existe una persona con la misma dirección de correo electrónico.',
       );
     }
 
@@ -47,7 +52,7 @@ export class PeopleService {
 
     if (existingPersonWithMobile) {
       throw new ConflictException(
-        'A person with the same mobile phone number already exists.',
+        'Ya existe una persona con el mismo número de teléfono móvil.',
       );
     }
 
@@ -85,17 +90,18 @@ export class PeopleService {
         .getOne();
     }
 
-    if (!person) throw new NotFoundException(`Person with ${term} not found`);
+    if (!person)
+      throw new NotFoundException(`Persona con ${term} no encontrada`);
     return person;
   }
-
   async update(id: string, updatePersonDto: UpdatePersonDto) {
     const person = await this.personRepository.preload({
       id: id,
       ...updatePersonDto,
     });
 
-    if (!person) throw new NotFoundException(`Person with id ${id} not found`);
+    if (!person)
+      throw new NotFoundException(`Persona con ID ${id} no encontrada`);
 
     try {
       await this.personRepository.save(person);
@@ -103,7 +109,7 @@ export class PeopleService {
     } catch (error) {
       if (error.code === '23505') {
         throw new ConflictException(
-          'A conflict occurred due to duplicate data.',
+          'Se produjo un conflicto debido a datos duplicados.',
         );
       } else {
         this.handleExceptions(error);
@@ -120,7 +126,7 @@ export class PeopleService {
     this.logger.error(error);
 
     throw new InternalServerErrorException(
-      'An unexpected error occurred. Please check server logs.',
+      'Se produjo un error inesperado. Por favor, revise los registros del servidor.',
     );
   }
 }
