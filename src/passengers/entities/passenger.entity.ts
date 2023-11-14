@@ -6,7 +6,6 @@ import {
   JoinColumn,
   OneToOne,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
 } from 'typeorm';
 
 export class Passenger {
@@ -34,11 +33,4 @@ export class Passenger {
     example: '2023-09-29T12:00:00Z',
   })
   createdAt: Date;
-
-  @UpdateDateColumn()
-  @ApiProperty({
-    description: 'The date and time when the passenger was last updated.',
-    example: '2023-09-29T14:30:00Z',
-  })
-  updatedAt: Date;
 }

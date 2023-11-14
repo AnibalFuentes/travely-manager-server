@@ -63,9 +63,7 @@ export class PassengersService {
    * @param paginationDto Datos de paginación.
    * @returns Lista de pasajeros paginada y detalles de paginación.
    */
-  async findAll(
-    paginationDto: PaginationDto,
-  ): Promise<{
+  async findAll(paginationDto: PaginationDto): Promise<{
     passengers: Passenger[];
     total: number;
     limit: number;
