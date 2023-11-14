@@ -1,8 +1,24 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ParseUUIDPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+  ParseUUIDPipe,
+} from '@nestjs/common';
 import { PassengersService } from './passengers.service';
 import { CreatePassengerDto } from './dto/create-passenger.dto';
 import { UpdatePassengerDto } from './dto/update-passenger.dto';
-import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Passenger } from './entities/passenger.entity';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
 import { Auth } from 'src/auth/decorators/auth.decorator';
@@ -40,7 +56,10 @@ export class PassengersController {
    */
   @Get()
   @ApiOperation({ summary: 'Obtener una lista de pasajeros' })
-  @ApiResponse({ status: 200, description: 'Lista de pasajeros recuperada exitosamente.' })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de pasajeros recuperada exitosamente.',
+  })
   findAll(@Query() paginationDto: PaginationDto) {
     return this.passengersService.findAll(paginationDto);
   }
@@ -54,7 +73,10 @@ export class PassengersController {
   @Get(':id')
   @ApiOperation({ summary: 'Obtener un pasajero por ID' })
   @ApiParam({ name: 'id', description: 'ID del pasajero (UUID)' })
-  @ApiResponse({ status: 200, description: 'Pasajero recuperado por ID exitosamente.' })
+  @ApiResponse({
+    status: 200,
+    description: 'Pasajero recuperado por ID exitosamente.',
+  })
   @ApiResponse({ status: 404, description: 'Pasajero no encontrado.' })
   findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.passengersService.findOne(id);
@@ -70,7 +92,10 @@ export class PassengersController {
   @Patch(':id')
   @ApiOperation({ summary: 'Actualizar un pasajero por ID' })
   @ApiParam({ name: 'id', description: 'ID del pasajero (UUID)' })
-  @ApiResponse({ status: 200, description: 'Pasajero actualizado por ID exitosamente.' })
+  @ApiResponse({
+    status: 200,
+    description: 'Pasajero actualizado por ID exitosamente.',
+  })
   @ApiResponse({ status: 404, description: 'Pasajero no encontrado.' })
   update(
     @Param('id', ParseUUIDPipe) id: string,
@@ -88,7 +113,10 @@ export class PassengersController {
   @Delete(':id')
   @ApiOperation({ summary: 'Eliminar un pasajero por ID' })
   @ApiParam({ name: 'id', description: 'ID del pasajero (UUID)' })
-  @ApiResponse({ status: 200, description: 'Pasajero eliminado por ID exitosamente.' })
+  @ApiResponse({
+    status: 200,
+    description: 'Pasajero eliminado por ID exitosamente.',
+  })
   @ApiResponse({ status: 404, description: 'Pasajero no encontrado.' })
   remove(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
     return this.passengersService.remove(id);
