@@ -1,7 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Company } from 'src/companies/entities/company.entity';
 import {
-  Column,
   CreateDateColumn,
   Entity,
   JoinColumn,
@@ -21,13 +20,6 @@ export class CustomerCompany {
   @OneToOne(() => Company, { cascade: true })
   @JoinColumn()
   company: Company;
-
-  @Column({ type: 'boolean', default: true })
-  @ApiProperty({
-    description: 'Indica si el cliente de tipo empresa está activo o no.',
-    example: true,
-  })
-  isActive: boolean;
 
   @CreateDateColumn()
   @ApiProperty({

@@ -40,7 +40,7 @@ export class PassengersService {
    * @throws NotFoundException Si no se encuentra la persona asociada.
    * @throws InternalServerErrorException Si ocurre un error inesperado.
    */
-  async create(createPassengerDto: CreatePassengerDto): Promise<Passenger> {
+  async create(createPassengerDto: CreatePassengerDto) {
     const createPersonDto = createPassengerDto.person;
 
     try {
@@ -92,7 +92,7 @@ export class PassengersService {
    * @returns Pasajero recuperado por ID exitosamente.
    * @throws NotFoundException Si el pasajero no se encuentra.
    */
-  async findOne(id: string): Promise<Passenger> {
+  async findOne(id: string) {
     const passenger = await this.getPassengerById(id);
 
     if (!passenger) {
@@ -111,10 +111,7 @@ export class PassengersService {
    * @throws NotFoundException Si el pasajero no se encuentra.
    * @throws InternalServerErrorException Si ocurre un error inesperado al guardar.
    */
-  async update(
-    id: string,
-    updatePassengerDto: UpdatePassengerDto,
-  ): Promise<Passenger> {
+  async update(id: string, updatePassengerDto: UpdatePassengerDto) {
     const passenger = await this.getPassengerById(id);
 
     if (!passenger) {
@@ -141,7 +138,7 @@ export class PassengersService {
    * @throws NotFoundException Si el pasajero no se encuentra.
    * @throws InternalServerErrorException Si ocurre un error inesperado al eliminar.
    */
-  async remove(id: string): Promise<void> {
+  async remove(id: string) {
     const passenger = await this.getPassengerById(id);
 
     if (!passenger) {

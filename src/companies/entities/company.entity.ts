@@ -27,18 +27,25 @@ export class Company {
     description: 'Número de identificación de la empresa',
     example: '123456789',
   })
-  idenficication: string;
+  nit: string;
 
-  @Column({ type: 'boolean', default: true })
+  @Column()
   @ApiProperty({
-    description: 'Indica si el cliente de tipo empresa está activo o no.',
-    example: true,
+    description: 'Dirección de la empresa',
+    example: '123 Main Street, Cityville',
   })
-  isActive: boolean;
+  address: string;
+
+  @Column()
+  @ApiProperty({
+    description: 'Número de contacto de la empresa',
+    example: '+1234567890',
+  })
+  contactNumber: string;
 
   @CreateDateColumn()
   @ApiProperty({
-    description: 'Fecha y hora en que se creó el cliente de tipo empresa.',
+    description: 'Fecha y hora en que se creó la empresa.',
     example: '2023-09-29T12:00:00Z',
   })
   createdAt: Date;

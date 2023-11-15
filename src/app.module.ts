@@ -13,7 +13,6 @@ import { OfficesModule } from './offices/offices.module';
 import { CompaniesModule } from './companies/companies.module';
 import { PeopleModule } from './people/people.module';
 import { SalesModule } from './sales/sales.module';
-import { SalesOrdersModule } from './sales-orders/sales-orders.module';
 import { AssignVehiclesModule } from './assign-vehicles/assign-vehicles.module';
 import { EmployeesDriversModule } from './employees-drivers/employees-drivers.module';
 import { EmployeesChiefsModule } from './employees-chiefs/employees-chiefs.module';
@@ -21,6 +20,7 @@ import { PassengersModule } from './passengers/passengers.module';
 import { EmployeesSellersModule } from './employees-sellers/employees-sellers.module';
 import { CustomersCompaniesModule } from './customers-companies/customers-companies.module';
 import { CustomersPeopleModule } from './customers-people/customers-people.module';
+import { TravelsModule } from './travels/travels.module';
 
 @Module({
   imports: [
@@ -46,7 +46,6 @@ import { CustomersPeopleModule } from './customers-people/customers-people.modul
     CompaniesModule,
     PeopleModule,
     SalesModule,
-    SalesOrdersModule,
     AssignVehiclesModule,
     EmployeesModule,
     EmployeesChiefsModule,
@@ -55,6 +54,7 @@ import { CustomersPeopleModule } from './customers-people/customers-people.modul
     CustomersCompaniesModule,
     CustomersPeopleModule,
     PassengersModule,
+    TravelsModule,
   ],
   controllers: [],
   providers: [],

@@ -54,20 +54,6 @@ export class Vehicle {
 
   @Column('int', { default: 0, nullable: true })
   @ApiProperty({
-    description: 'Número de ejes del vehículo.',
-    example: 2,
-  })
-  numberAxles: number;
-
-  @Column('varchar', { nullable: true })
-  @ApiProperty({
-    description: 'Color del vehículo.',
-    example: 'Azul',
-  })
-  color: string;
-
-  @Column('int', { default: 0, nullable: true })
-  @ApiProperty({
     description: 'Número de asientos en el vehículo.',
     example: 5,
   })

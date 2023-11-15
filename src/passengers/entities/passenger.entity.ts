@@ -1,13 +1,17 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Person } from 'src/people/entities/person.entity';
+import { Travel } from 'src/travels/entities/travel.entity';
 import {
   Column,
   CreateDateColumn,
+  Entity,
   JoinColumn,
+  ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
+@Entity()
 export class Passenger {
   @PrimaryGeneratedColumn('uuid')
   @ApiProperty({
@@ -19,6 +23,9 @@ export class Passenger {
   @OneToOne(() => Person, { cascade: true })
   @JoinColumn()
   person: Person;
+
+  @ManyToOne(() => Travel, (travel) => travel.passenger)
+  travel: Travel;
 
   @Column({ type: 'boolean', default: true })
   @ApiProperty({

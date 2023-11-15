@@ -8,6 +8,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 @Module({
   controllers: [EmployeesDriversController],
   providers: [EmployeesDriversService],
+  exports: [EmployeesDriversService],
   imports: [TypeOrmModule.forFeature([EmployeeDriver]), EmployeesModule],
 })
 export class EmployeesDriversModule {}
