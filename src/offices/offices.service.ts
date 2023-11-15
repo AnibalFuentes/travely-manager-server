@@ -1,26 +1,94 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateOfficeDto } from './dto/create-office.dto';
 import { UpdateOfficeDto } from './dto/update-office.dto';
+import { Repository } from 'typeorm';
+import { Office } from './entities/office.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { validate as isUUID } from 'uuid';
 
 @Injectable()
 export class OfficesService {
-  create(createOfficeDto: CreateOfficeDto) {
-    return 'This action adds a new office';
+  private readonly logger = new Logger('OfficesService');
+
+  constructor(
+    @InjectRepository(Office)
+    private readonly officeRepository: Repository<Office>,
+  ) {}
+
+  async create(createOfficeDto: CreateOfficeDto) {
+    const { name } = createOfficeDto;
+
+    const existingOffice = await this.officeRepository.findOne({
+      where: { name },
+    });
+
+    if (existingOffice) {
+      throw new ConflictException('Ya existe una oficina con el mismo nombre.');
+    }
+
+    try {
+      const office = this.officeRepository.create(createOfficeDto);
+      await this.officeRepository.save(office);
+      return office;
+    } catch (error) {
+      this.handleExceptions(error);
+    }
   }
 
   findAll() {
-    return `This action returns all offices`;
+    return this.officeRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} office`;
+  async findOne(term: string) {
+    let office: Office;
+    if (isUUID(term)) {
+      office = await this.officeRepository.findOneBy({ id: term });
+    } else {
+      const queryBuilder = this.officeRepository.createQueryBuilder('office');
+      office = await queryBuilder
+        .where('name = :term', {
+          term: term.toLowerCase(),
+        })
+        .getOne();
+    }
+    if (!office)
+      throw new NotFoundException(`Oficina con ${term} no encontrada`);
+    return office;
   }
 
-  update(id: number, updateOfficeDto: UpdateOfficeDto) {
-    return `This action updates a #${id} office`;
+  async update(id: string, updateOfficeDto: UpdateOfficeDto) {
+    const office = await this.officeRepository.preload({
+      id: id,
+      ...updateOfficeDto,
+    });
+
+    if (!office)
+      throw new NotFoundException(`Oficina con ID ${id} no encontrada`);
+
+    try {
+      await this.officeRepository.save(office);
+      return office;
+    } catch (error) {
+      this.handleExceptions(error);
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} office`;
+  async remove(id: string) {
+    const office = await this.findOne(id);
+    await this.officeRepository.remove(office);
+  }
+
+  private handleExceptions(error: any) {
+    this.logger.error(error);
+
+    throw new InternalServerErrorException(
+      'Se produjo un error inesperado. Por favor, revise los registros del servidor.',
+    );
   }
 }

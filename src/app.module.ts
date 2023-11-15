@@ -15,10 +15,12 @@ import { PeopleModule } from './people/people.module';
 import { SalesModule } from './sales/sales.module';
 import { SalesOrdersModule } from './sales-orders/sales-orders.module';
 import { AssignVehiclesModule } from './assign-vehicles/assign-vehicles.module';
-import { EmployeesOfficesModule } from './employees-offices/employees-offices.module';
 import { EmployeesDriversModule } from './employees-drivers/employees-drivers.module';
 import { EmployeesChiefsModule } from './employees-chiefs/employees-chiefs.module';
 import { PassengersModule } from './passengers/passengers.module';
+import { EmployeesSellersModule } from './employees-sellers/employees-sellers.module';
+import { CustomersCompaniesModule } from './customers-companies/customers-companies.module';
+import { CustomersPeopleModule } from './customers-people/customers-people.module';
 
 @Module({
   imports: [
@@ -34,11 +36,10 @@ import { PassengersModule } from './passengers/passengers.module';
       synchronize: true,
     }),
     CommonModule,
-    UsersModule,
     AuthModule,
+    UsersModule,
     CustomersModule,
     VehiclesModule,
-    EmployeesModule,
     BrandsModule,
     LocationsModule,
     OfficesModule,
@@ -47,9 +48,12 @@ import { PassengersModule } from './passengers/passengers.module';
     SalesModule,
     SalesOrdersModule,
     AssignVehiclesModule,
-    EmployeesOfficesModule,
-    EmployeesDriversModule,
+    EmployeesModule,
     EmployeesChiefsModule,
+    EmployeesDriversModule,
+    EmployeesSellersModule,
+    CustomersCompaniesModule,
+    CustomersPeopleModule,
     PassengersModule,
   ],
   controllers: [],
