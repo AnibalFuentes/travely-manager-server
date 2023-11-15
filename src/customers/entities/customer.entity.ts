@@ -1,11 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Customer {
@@ -15,13 +10,6 @@ export class Customer {
     example: 'e87ef3f1-1f2a-4b6f-b381-4ea3c40b6d3a',
   })
   id: string;
-
-  @Column({ type: 'boolean', default: true })
-  @ApiProperty({
-    description: 'Indica si el cliente está activo o no.',
-    example: true,
-  })
-  isActive: boolean;
 
   @CreateDateColumn()
   @ApiProperty({

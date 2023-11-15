@@ -136,21 +136,9 @@ export class VehiclesService {
     return vehicles;
   }
 
-  async findVehiclesByColor(color: string) {
-    const vehicles = await this.vehicleRepository.find({ where: { color } });
-    return vehicles;
-  }
-
   async findVehiclesByNumberOfSeats(seats: number) {
     const vehicles = await this.vehicleRepository.find({
       where: { numberOfSeats: seats },
-    });
-    return vehicles;
-  }
-
-  async findVehiclesByNumberOfAxles(axles: number) {
-    const vehicles = await this.vehicleRepository.find({
-      where: { numberAxles: axles },
     });
     return vehicles;
   }

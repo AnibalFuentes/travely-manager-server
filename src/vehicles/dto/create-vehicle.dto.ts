@@ -56,15 +56,6 @@ export class CreateVehicleDto {
   manufacturingYear?: number;
 
   @ApiProperty({
-    description: 'Número de ejes del vehículo.',
-    example: 2,
-  })
-  @IsOptional()
-  @IsInt()
-  @Min(0)
-  numberAxles?: number;
-
-  @ApiProperty({
     description: 'Color del vehículo.',
     example: 'Azul',
   })
