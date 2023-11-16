@@ -11,6 +11,13 @@ export class CreateSaleDto {
   sellerId: string;
 
   @ApiProperty({
+    description: 'ID de la oficina asociada a la venta.',
+    example: 'e87ef3f1-1f2a-4b6f-b381-4ea3c40b6d3a',
+  })
+  @IsNotEmpty()
+  officeId: string;
+
+  @ApiProperty({
     description: 'Monto total recibido por la venta.',
     example: 100.0,
   })

@@ -21,6 +21,7 @@ import { EmployeesSellersModule } from './employees-sellers/employees-sellers.mo
 import { CustomersCompaniesModule } from './customers-companies/customers-companies.module';
 import { CustomersPeopleModule } from './customers-people/customers-people.module';
 import { TravelsModule } from './travels/travels.module';
+import { SeedModule } from './seed/seed.module';
 
 @Module({
   imports: [
@@ -55,6 +56,7 @@ import { TravelsModule } from './travels/travels.module';
     CustomersPeopleModule,
     PassengersModule,
     TravelsModule,
+    SeedModule,
   ],
   controllers: [],
   providers: [],

@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { SaleStatus } from 'src/common/enums/sale-status.enum';
 import { EmployeeSeller } from 'src/employees-sellers/entities/employee-seller.entity';
+import { Office } from 'src/offices/entities/office.entity';
 import { Travel } from 'src/travels/entities/travel.entity';
 import {
   Column,
@@ -28,6 +29,15 @@ export class Sale {
     type: () => EmployeeSeller,
   })
   seller: EmployeeSeller;
+
+  @ManyToOne(() => Office, (office) => office.id, {
+    eager: true,
+  })
+  @ApiProperty({
+    description: 'Oficina asociada a la venta.',
+    type: () => Office,
+  })
+  office: Office;
 
   @Column({ type: 'decimal', precision: 10, scale: 2, default: 0.0 })
   @ApiProperty({
