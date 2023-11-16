@@ -56,14 +56,6 @@ export class CreateVehicleDto {
   manufacturingYear?: number;
 
   @ApiProperty({
-    description: 'Color del vehículo.',
-    example: 'Azul',
-  })
-  @IsOptional()
-  @IsString()
-  color?: string;
-
-  @ApiProperty({
     description: 'Número de asientos en el vehículo.',
     example: 5,
   })
