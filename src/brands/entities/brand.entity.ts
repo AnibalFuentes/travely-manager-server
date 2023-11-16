@@ -6,14 +6,14 @@ import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 export class Brand {
   @PrimaryGeneratedColumn('uuid')
   @ApiProperty({
-    description: 'The unique identifier for a brand',
+    description: 'Identificador único de la marca',
     example: 'e87ef3f1-1f2a-4b6f-b381-4ea3c40b6d3a',
   })
   id: string;
 
   @Column('varchar', { length: 50, unique: true })
   @ApiProperty({
-    description: 'The name of the brand',
+    description: 'El nombre de la marca',
     example: 'Mercedes Benz',
   })
   name: string;

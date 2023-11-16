@@ -29,7 +29,7 @@ export class BrandsService {
     });
 
     if (existingBrand) {
-      throw new ConflictException('A brand with the same name already exists.');
+      throw new ConflictException('Ya existe una marca con el mismo nombre.');
     }
 
     try {
@@ -58,7 +58,7 @@ export class BrandsService {
         })
         .getOne();
     }
-    if (!brand) throw new NotFoundException(`Brand with ${term} not found`);
+    if (!brand) throw new NotFoundException(`Marca con ${term} no encontrada`);
     return brand;
   }
 
@@ -68,7 +68,7 @@ export class BrandsService {
       ...updateBrandDto,
     });
 
-    if (!brand) throw new NotFoundException(`Brand with id ${id} not found`);
+    if (!brand) throw new NotFoundException(`Marca con ID ${id} no encontrada`);
 
     try {
       await this.brandRepository.save(brand);
@@ -79,15 +79,15 @@ export class BrandsService {
   }
 
   async remove(id: string) {
-    const person = await this.findOne(id);
-    await this.brandRepository.remove(person);
+    const brand = await this.findOne(id);
+    await this.brandRepository.remove(brand);
   }
 
   private handleExceptions(error: any) {
     this.logger.error(error);
 
     throw new InternalServerErrorException(
-      'An unexpected error occurred. Please check server logs.',
+      'Ocurrió un error inesperado. Por favor, verifica los registros del servidor.',
     );
   }
 }
