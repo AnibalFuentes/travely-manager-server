@@ -11,12 +11,14 @@ import { validate as isUUID } from 'uuid';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
+
 @Injectable()
 export class UsersService {
   private readonly logger = new Logger('UsersService');
 
   constructor(
-    @InjectRepository(User) private readonly userRepository: Repository<User>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
   ) {}
 
   async create(createUserDto: CreateUserDto) {
@@ -24,7 +26,9 @@ export class UsersService {
     const existingUser = await this.findOneByEmail(email);
 
     if (existingUser) {
-      throw new ConflictException(`Email "${email}" is already in use`);
+      throw new ConflictException(
+        `El correo electrónico "${email}" ya está en uso`,
+      );
     }
 
     try {
@@ -52,7 +56,7 @@ export class UsersService {
         .getOne();
     }
 
-    if (!user) throw new NotFoundException(`User with ${term} not found`);
+    if (!user) throw new NotFoundException(`Usuario con ${term} no encontrado`);
     return user;
   }
 
@@ -73,7 +77,8 @@ export class UsersService {
       ...updateUserDto,
     });
 
-    if (!user) throw new NotFoundException(`User with id ${id} not found`);
+    if (!user)
+      throw new NotFoundException(`Usuario con ID ${id} no encontrado`);
 
     try {
       await this.userRepository.save(user);
@@ -92,7 +97,7 @@ export class UsersService {
     this.logger.error(error);
 
     throw new InternalServerErrorException(
-      'An unexpected error occurred. Please check server logs.',
+      'Ocurrió un error inesperado. Por favor, verifica los registros del servidor.',
     );
   }
 }

@@ -1,7 +1,14 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { Location } from './entities/location.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { CreateLocationDto } from './dto/create-location.dto';
 
 @Injectable()
 export class LocationsService {
@@ -11,6 +18,14 @@ export class LocationsService {
     @InjectRepository(Location)
     private readonly locationRepository: Repository<Location>,
   ) {}
+
+  async create(createLocationDto: CreateLocationDto) {
+    try {
+      const location = this.locationRepository.create(createLocationDto);
+      await this.locationRepository.save(location);
+      return location;
+    } catch (error) {}
+  }
 
   /**
    * @summary Obtener departamentos únicos
@@ -57,34 +72,98 @@ export class LocationsService {
    * @returns Distancia en kilómetros entre las dos ciudades.
    * @throws NotFoundException Si una o ambas ciudades no se encuentran.
    */
-  async calculateDistance(cityOrigin: string, destinationCity: string) {
-    const [locationOrigin, location2] = await Promise.all([
-      this.locationRepository.findOneBy({ city: cityOrigin }),
-      this.locationRepository.findOneBy({ city: destinationCity }),
-    ]);
-
-    if (!locationOrigin || !location2) {
-      throw new NotFoundException('Una o ambas ciudades no se encontraron');
+  async calculateDistanceAndDuration(
+    cityOrigin: string,
+    destinationCity: string,
+    averageSpeedKmPerHour: number,
+  ) {
+    // Validación de parámetros
+    if (
+      typeof cityOrigin !== 'string' ||
+      typeof destinationCity !== 'string' ||
+      typeof averageSpeedKmPerHour !== 'number'
+    ) {
+      throw new BadRequestException('Parámetros inválidos');
     }
 
-    const earthRadiusKm = 6371; // Radio de la Tierra en kilómetros
+    try {
+      // Obtener ubicaciones
+      const [locationOrigin, location2] = await Promise.all([
+        this.locationRepository.findOneBy({ city: cityOrigin }),
+        this.locationRepository.findOneBy({ city: destinationCity }),
+      ]);
 
-    const toRadians = (degrees: number) => (degrees * Math.PI) / 180;
+      // Validar velocidad promedio
+      if (averageSpeedKmPerHour <= 0) {
+        throw new BadRequestException(
+          'La velocidad promedio debe ser mayor que 0',
+        );
+      }
 
-    const deltaLat = toRadians(location2.latitude - locationOrigin.latitude);
-    const deltaLon = toRadians(location2.longitude - locationOrigin.longitude);
+      // Validar ubicaciones
+      if (!locationOrigin) {
+        throw new NotFoundException(
+          `La ciudad de origen '${cityOrigin}' no se encontró`,
+        );
+      }
 
-    const a =
-      Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
-      Math.cos(toRadians(locationOrigin.latitude)) *
-        Math.cos(toRadians(location2.latitude)) *
-        Math.sin(deltaLon / 2) *
-        Math.sin(deltaLon / 2);
+      if (!location2) {
+        throw new NotFoundException(
+          `La ciudad de destino '${destinationCity}' no se encontró`,
+        );
+      }
 
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      // Convertir grados a radianes
+      const toRadians = (degrees: number) => (degrees * Math.PI) / 180;
 
-    const distance = earthRadiusKm * c;
+      // Calcular la diferencia en latitud y longitud en radianes
+      const deltaLat = toRadians(location2.latitude - locationOrigin.latitude);
+      const deltaLon = toRadians(
+        location2.longitude - locationOrigin.longitude,
+      );
 
-    return distance;
+      // Fórmula de Haversine para calcular la distancia
+      const a =
+        Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
+        Math.cos(toRadians(locationOrigin.latitude)) *
+          Math.cos(toRadians(location2.latitude)) *
+          Math.sin(deltaLon / 2) *
+          Math.sin(deltaLon / 2);
+
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+      // Calcular la distancia en kilómetros
+      const distance = 6371 * c; // Radio de la Tierra en kilómetros
+
+      // Calcular la duración en horas
+      const durationHours = distance / averageSpeedKmPerHour;
+
+      // Redondear valores a 2 decimales
+      const roundedDistance = Number(distance.toFixed(2));
+      const roundedDuration = Number(durationHours.toFixed(2));
+
+      return {
+        distance: roundedDistance,
+        duration: roundedDuration,
+      };
+    } catch (error) {
+      if (
+        error instanceof BadRequestException ||
+        error instanceof NotFoundException
+      ) {
+        throw error;
+      } else {
+        throw new InternalServerErrorException(
+          'Error al calcular la distancia y duración',
+        );
+      }
+    }
+  }
+
+  async removeAll() {
+    const query = this.locationRepository.createQueryBuilder('location');
+    try {
+      return await query.delete().where({}).execute();
+    } catch (error) {}
   }
 }

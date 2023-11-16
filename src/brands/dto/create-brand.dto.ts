@@ -4,7 +4,7 @@ import { IsString } from 'class-validator';
 export class CreateBrandDto {
   @IsString()
   @ApiProperty({
-    description: 'The name of the brand',
+    description: 'El nombre de la marca',
     example: 'Mercedes Benz',
   })
   name: string;

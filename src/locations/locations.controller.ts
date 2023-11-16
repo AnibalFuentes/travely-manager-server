@@ -1,4 +1,10 @@
-import { Controller, Get, NotFoundException, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { LocationsService } from './locations.service';
 import {
   ApiBearerAuth,
@@ -66,10 +72,11 @@ export class LocationsController {
     }
   }
 
-  @Get('distance/:cityOrigin/:destinationCity')
+  @Get(':cityOrigin/:destinationCity')
   @ApiOperation({
-    summary: 'Calcular distancia entre ciudades',
-    description: 'Calcula la distancia entre dos ciudades proporcionadas.',
+    summary: 'Calcular distancia y duración entre ciudades',
+    description:
+      'Calcula la distancia y duración entre dos ciudades proporcionadas.',
   })
   @ApiParam({
     name: 'cityOrigin',
@@ -81,29 +88,30 @@ export class LocationsController {
   })
   @ApiResponse({
     status: 200,
-    description: 'Distancia calculada exitosamente.',
-    type: Number, // Cambia el tipo según la respuesta real
+    description: 'Distancia y duración calculadas exitosamente.',
+    type: Object,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Parámetros inválidos.',
   })
   @ApiResponse({
     status: 404,
     description: 'Una o más ciudades no fueron encontradas.',
   })
-  async calculateDistance(
+  @ApiResponse({
+    status: 500,
+    description: 'Error interno del servidor.',
+  })
+  async calculateDistanceAndDuration(
     @Param('cityOrigin') cityOrigin: string,
     @Param('destinationCity') destinationCity: string,
   ) {
-    try {
-      return this.locationsService.calculateDistance(
-        cityOrigin,
-        destinationCity,
-      );
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException(
-          'Una o más ciudades no fueron encontradas.',
-        );
-      }
-      throw error;
-    }
+    const result = await this.locationsService.calculateDistanceAndDuration(
+      cityOrigin,
+      destinationCity,
+      60,
+    );
+    return result;
   }
 }
