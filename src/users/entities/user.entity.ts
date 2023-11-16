@@ -1,9 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Role } from 'src/common/enums/role.enum';
+import { Login } from 'src/logins/entities/login.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -51,4 +53,7 @@ export class User {
     example: '2023-09-29T12:00:00Z',
   })
   createdAt: Date;
+
+  @OneToMany(() => Login, (login) => login.user)
+  logins: Login[];
 }

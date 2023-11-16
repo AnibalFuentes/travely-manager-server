@@ -10,12 +10,14 @@ import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { RegisterAuthDto } from './dto/register-auth.dto';
+import { LoginsService } from 'src/logins/logins.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private jwtService: JwtService,
+    private readonly loginsService: LoginsService,
   ) {}
 
   async login({ email, password }: LoginAuthDto) {
@@ -36,6 +38,8 @@ export class AuthService {
     if (!isPasswordValid) {
       throw new UnauthorizedException('Contraseña no válida');
     }
+
+    const login = await this.loginsService.create(existingUser);
 
     const payload = {
       sub: existingUser.id,
