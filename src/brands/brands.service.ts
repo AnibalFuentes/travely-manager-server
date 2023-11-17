@@ -87,18 +87,65 @@ export class BrandsService {
   }
 
   async generateReportPDF(): Promise<Buffer> {
-    const pdfBuffer: Buffer = await new Promise((resolve) => {
+    const pdfBuffer: Buffer = await new Promise(async (resolve) => {
       const doc = new PDFDocument({
         size: 'LETTER',
         bufferPages: true,
       });
 
-      //todo
-      doc.text('PDF Generado en nuestro servidor');
+      // Configuración del documento
+      const currentDate = new Date().toLocaleString();
+      const title = 'Informe de Marcas';
+      const pageMargins = 50;
+
+      // Configuración del encabezado
+      doc.font('Helvetica-Bold').fontSize(18).text(title, { align: 'center' }); // Título en negrita
       doc.moveDown();
-      doc.text(
-        'Esto es un ejemplo de como generar un pdf en nuestro servidor nestjs',
+      doc
+        .fontSize(12)
+        .text(`Fecha de generación: ${currentDate}`, { align: 'center' });
+
+      // Obtener todas las marcas desde la base de datos
+      const brands = await this.brandRepository.find();
+
+      // Configuración de la tabla
+      const brandTable = {
+        title: 'Tabla de Marcas',
+        headers: ['Nº', 'Nombre'], // Cambiado 'ID' por 'Nº'
+        rows: brands.map((brand, index) => [index + 1, brand.name]), // Enumerar cada registro
+      };
+
+      // Calcular el ancho de la tabla
+      const availableWidth = doc.page.width - pageMargins * 2;
+      const columnsSize = brandTable.headers.map(
+        () => availableWidth / brandTable.headers.length,
       );
+
+      // Centrar la tabla en el documento
+      const tableX = pageMargins;
+
+      // Agregar la tabla al informe
+      doc.moveDown();
+      doc.table(brandTable, {
+        x: tableX,
+        columnsSize,
+      });
+
+      // Configuración del pie de página
+      const totalPages = doc.bufferedPageRange().count;
+      for (let i = 0; i < totalPages; i++) {
+        doc.switchToPage(i);
+
+        // Agregar el paginado al final de la página
+        doc
+          .fontSize(10)
+          .text(
+            `Página ${i + 1} de ${totalPages}`,
+            doc.page.width / 2,
+            doc.page.height - pageMargins,
+            { align: 'center' },
+          );
+      }
 
       const buffer = [];
       doc.on('data', buffer.push.bind(buffer));

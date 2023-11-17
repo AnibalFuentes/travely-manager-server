@@ -106,7 +106,7 @@ export class LoginsController {
   })
   async downloadPDF(@Res() res): Promise<void> {
     try {
-      const buffer = await this.loginsService.generateReportPDF();
+      const buffer = await this.loginsService.generateLoginReportPDF();
 
       res.set({
         'Content-Type': 'application/pdf',

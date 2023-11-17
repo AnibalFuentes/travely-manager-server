@@ -160,7 +160,7 @@ export class OfficesController {
   })
   async downloadPDF(@Res() res): Promise<void> {
     try {
-      const buffer = await this.officesService.generateReportPDF();
+      const buffer = await this.officesService.generateOfficeReportPDF();
 
       res.set({
         'Content-Type': 'application/pdf',
