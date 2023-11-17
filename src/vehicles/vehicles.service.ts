@@ -15,6 +15,9 @@ import { BrandsService } from 'src/brands/brands.service';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
 import { validate as isUUID } from 'uuid';
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const PDFDocument = require('pdfkit-table');
+
 @Injectable()
 export class VehiclesService {
   private readonly logger = new Logger('VehiclesService');
@@ -168,6 +171,32 @@ export class VehiclesService {
   async remove(id: string) {
     const vehicle = await this.findOne(id);
     await this.vehicleRepository.remove(vehicle);
+  }
+
+  async generateReportPDF(): Promise<Buffer> {
+    const pdfBuffer: Buffer = await new Promise((resolve) => {
+      const doc = new PDFDocument({
+        size: 'LETTER',
+        bufferPages: true,
+      });
+
+      //todo
+      doc.text('PDF Generado en nuestro servidor');
+      doc.moveDown();
+      doc.text(
+        'Esto es un ejemplo de como generar un pdf en nuestro servidor nestjs',
+      );
+
+      const buffer = [];
+      doc.on('data', buffer.push.bind(buffer));
+      doc.on('end', () => {
+        const data = Buffer.concat(buffer);
+        resolve(data);
+      });
+      doc.end();
+    });
+
+    return pdfBuffer;
   }
 
   private handleExceptions(error: any) {

@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { SalesService } from './sales.service';
-import { SalesController } from './sales.controller';
 import { Sale } from './entities/sale.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { SalesController } from './sales.controller';
 
 @Module({
   controllers: [SalesController],

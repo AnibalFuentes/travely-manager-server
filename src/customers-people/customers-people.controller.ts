@@ -8,6 +8,7 @@ import {
   Delete,
   ParseUUIDPipe,
   Query,
+  Res,
 } from '@nestjs/common';
 import { CustomersPeopleService } from './customers-people.service';
 import { CreateCustomerPersonDto } from './dto/create-customer-person.dto';
@@ -140,5 +141,44 @@ export class CustomersPeopleController {
   })
   remove(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
     return this.customersPeopleService.remove(id);
+  }
+
+  /**
+   * @summary Descargar un informe PDF de clientes de tipo persona
+   * @description Descarga un informe en formato PDF que contiene la información de los clientes de tipo persona.
+   * @param res Respuesta HTTP.
+   * @returns Archivo PDF descargado.
+   */
+  @Get('pdf/download')
+  @ApiOperation({
+    summary: 'Descargar un informe PDF de clientes de tipo persona',
+    description:
+      'Descarga un informe en formato PDF que contiene la información de los clientes de tipo persona.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Archivo PDF descargado exitosamente.',
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Error interno del servidor al generar el informe PDF.',
+  })
+  async downloadPDF(@Res() res): Promise<void> {
+    try {
+      const buffer = await this.customersPeopleService.generateReportPDF();
+
+      res.set({
+        'Content-Type': 'application/pdf',
+        'Content-Disposition':
+          'attachment; filename=informe-clientes-personas.pdf',
+        'Content-Length': buffer.length.toString(),
+      });
+
+      res.end(buffer);
+    } catch (error) {
+      res.status(500).json({
+        error: 'Error interno del servidor al generar el informe PDF.',
+      });
+    }
   }
 }

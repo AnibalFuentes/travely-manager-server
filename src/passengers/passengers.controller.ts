@@ -8,6 +8,7 @@ import {
   Delete,
   Query,
   ParseUUIDPipe,
+  Res,
 } from '@nestjs/common';
 import { PassengersService } from './passengers.service';
 import { CreatePassengerDto } from './dto/create-passenger.dto';
@@ -120,5 +121,47 @@ export class PassengersController {
   @ApiResponse({ status: 404, description: 'Pasajero no encontrado.' })
   remove(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
     return this.passengersService.remove(id);
+  }
+
+  // ... (otro código)
+
+  /**
+   * @summary Descargar un informe PDF de pasajeros
+   * @description Descarga un informe en formato PDF que contiene la información de los pasajeros.
+   * @param res Respuesta HTTP.
+   * @returns Archivo PDF descargado.
+   */
+  @Get('pdf/download')
+  @ApiOperation({
+    summary: 'Descargar un informe PDF de pasajeros',
+    description:
+      'Descarga un informe en formato PDF que contiene la información de los pasajeros.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Archivo PDF de pasajeros descargado exitosamente.',
+  })
+  @ApiResponse({
+    status: 500,
+    description:
+      'Error interno del servidor al generar el informe PDF de pasajeros.',
+  })
+  async downloadPDF(@Res() res): Promise<void> {
+    try {
+      const buffer = await this.passengersService.generateReportPDF();
+
+      res.set({
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': 'attachment; filename=informe-pasajeros.pdf',
+        'Content-Length': buffer.length.toString(),
+      });
+
+      res.end(buffer);
+    } catch (error) {
+      res.status(500).json({
+        error:
+          'Error interno del servidor al generar el informe PDF de pasajeros.',
+      });
+    }
   }
 }

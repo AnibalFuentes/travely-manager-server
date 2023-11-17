@@ -8,6 +8,7 @@ import {
   Delete,
   Query,
   ParseUUIDPipe,
+  Res,
 } from '@nestjs/common';
 import { EmployeesSellersService } from './employees-sellers.service';
 import { CreateEmployeeSellerDto } from './dto/create-employee-seller.dto';
@@ -122,5 +123,43 @@ export class EmployeesSellersController {
   @ApiResponse({ status: 404, description: 'Vendedor no encontrado.' })
   remove(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
     return this.employeesSellersService.remove(id);
+  }
+
+  /**
+   * @summary Descargar un informe PDF de vendedores
+   * @description Descarga un informe en formato PDF que contiene la información de los vendedores.
+   * @param res Respuesta HTTP.
+   * @returns Archivo PDF descargado.
+   */
+  @Get('pdf/download')
+  @ApiOperation({
+    summary: 'Descargar un informe PDF de vendedores',
+    description:
+      'Descarga un informe en formato PDF que contiene la información de los vendedores.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Archivo PDF descargado exitosamente.',
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Error interno del servidor al generar el informe PDF.',
+  })
+  async downloadPDF(@Res() res): Promise<void> {
+    try {
+      const buffer = await this.employeesSellersService.generateReportPDF();
+
+      res.set({
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': 'attachment; filename=informe-vendedores.pdf',
+        'Content-Length': buffer.length.toString(),
+      });
+
+      res.end(buffer);
+    } catch (error) {
+      res.status(500).json({
+        error: 'Error interno del servidor al generar el informe PDF.',
+      });
+    }
   }
 }

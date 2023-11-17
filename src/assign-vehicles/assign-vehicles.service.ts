@@ -14,6 +14,9 @@ import { VehiclesService } from 'src/vehicles/vehicles.service';
 import { EmployeesDriversService } from 'src/employees-drivers/employees-drivers.service';
 import { validate as isUUID } from 'uuid';
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const PDFDocument = require('pdfkit-table');
+
 @Injectable()
 export class AssignVehiclesService {
   private readonly logger = new Logger('AssignVehiclesService');
@@ -149,5 +152,31 @@ export class AssignVehiclesService {
     }
 
     await this.assignVehicleRepository.remove(assignVehicle);
+  }
+
+  async generateReportPDF(): Promise<Buffer> {
+    const pdfBuffer: Buffer = await new Promise((resolve) => {
+      const doc = new PDFDocument({
+        size: 'LETTER',
+        bufferPages: true,
+      });
+
+      //todo
+      doc.text('PDF Generado en nuestro servidor');
+      doc.moveDown();
+      doc.text(
+        'Esto es un ejemplo de como generar un pdf en nuestro servidor nestjs',
+      );
+
+      const buffer = [];
+      doc.on('data', buffer.push.bind(buffer));
+      doc.on('end', () => {
+        const data = Buffer.concat(buffer);
+        resolve(data);
+      });
+      doc.end();
+    });
+
+    return pdfBuffer;
   }
 }

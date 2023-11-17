@@ -12,6 +12,9 @@ import { Repository } from 'typeorm';
 import { EmployeesService } from 'src/employees/employees.service';
 import { InjectRepository } from '@nestjs/typeorm';
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const PDFDocument = require('pdfkit-table');
+
 @Injectable()
 export class EmployeesSellersService {
   private readonly logger = new Logger('EmployeeSellersService');
@@ -155,6 +158,32 @@ export class EmployeesSellersService {
     } catch (error) {
       this.handleExceptions(error);
     }
+  }
+
+  async generateReportPDF(): Promise<Buffer> {
+    const pdfBuffer: Buffer = await new Promise((resolve) => {
+      const doc = new PDFDocument({
+        size: 'LETTER',
+        bufferPages: true,
+      });
+
+      //todo
+      doc.text('PDF Generado en nuestro servidor');
+      doc.moveDown();
+      doc.text(
+        'Esto es un ejemplo de como generar un pdf en nuestro servidor nestjs',
+      );
+
+      const buffer = [];
+      doc.on('data', buffer.push.bind(buffer));
+      doc.on('end', () => {
+        const data = Buffer.concat(buffer);
+        resolve(data);
+      });
+      doc.end();
+    });
+
+    return pdfBuffer;
   }
 
   private handleExceptions(error: any) {
