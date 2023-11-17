@@ -6,6 +6,7 @@ import {
   Param,
   Delete,
   ParseUUIDPipe,
+  Res,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -111,5 +112,45 @@ export class UsersController {
   @ApiResponse({ status: 404, description: 'Usuario no encontrado' })
   remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.usersService.remove(id);
+  }
+
+  /**
+   * @summary Descargar un informe PDF de usuarios
+   * @description Descarga un informe en formato PDF que contiene la información de los usuarios.
+   * @param res Respuesta HTTP.
+   * @returns Archivo PDF descargado.
+   */
+  @Get('pdf/download')
+  @ApiOperation({
+    summary: 'Descargar un informe PDF de usuarios',
+    description:
+      'Descarga un informe en formato PDF que contiene la información de los usuarios.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Archivo PDF de usuarios descargado exitosamente.',
+  })
+  @ApiResponse({
+    status: 500,
+    description:
+      'Error interno del servidor al generar el informe PDF de usuarios.',
+  })
+  async downloadPDF(@Res() res): Promise<void> {
+    try {
+      const buffer = await this.usersService.generateReportPDF();
+
+      res.set({
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': 'attachment; filename=informe-usuarios.pdf',
+        'Content-Length': buffer.length.toString(),
+      });
+
+      res.end(buffer);
+    } catch (error) {
+      res.status(500).json({
+        error:
+          'Error interno del servidor al generar el informe PDF de usuarios.',
+      });
+    }
   }
 }

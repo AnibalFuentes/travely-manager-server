@@ -8,6 +8,7 @@ import {
   Delete,
   ParseUUIDPipe,
   Query,
+  Res,
 } from '@nestjs/common';
 import { VehiclesService } from './vehicles.service';
 import { CreateVehicleDto } from './dto/create-vehicle.dto';
@@ -251,5 +252,45 @@ export class VehiclesController {
   @ApiResponse({ status: 404, description: 'Vehículo no encontrado' })
   remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.vehiclesService.remove(id);
+  }
+
+  /**
+   * @summary Descargar un informe PDF de vehículos
+   * @description Descarga un informe en formato PDF que contiene la información de los vehículos.
+   * @param res Respuesta HTTP.
+   * @returns Archivo PDF descargado.
+   */
+  @Get('pdf/download')
+  @ApiOperation({
+    summary: 'Descargar un informe PDF de vehículos',
+    description:
+      'Descarga un informe en formato PDF que contiene la información de los vehículos.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Archivo PDF de vehículos descargado exitosamente.',
+  })
+  @ApiResponse({
+    status: 500,
+    description:
+      'Error interno del servidor al generar el informe PDF de vehículos.',
+  })
+  async downloadPDF(@Res() res): Promise<void> {
+    try {
+      const buffer = await this.vehiclesService.generateReportPDF();
+
+      res.set({
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': 'attachment; filename=informe-vehiculos.pdf',
+        'Content-Length': buffer.length.toString(),
+      });
+
+      res.end(buffer);
+    } catch (error) {
+      res.status(500).json({
+        error:
+          'Error interno del servidor al generar el informe PDF de vehículos.',
+      });
+    }
   }
 }

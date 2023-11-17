@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Res,
 } from '@nestjs/common';
 import { AssignVehiclesService } from './assign-vehicles.service';
 import { CreateAssignVehicleDto } from './dto/create-assign-vehicle.dto';
@@ -128,5 +129,47 @@ export class AssignVehiclesController {
   })
   remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.assignVehiclesService.remove(id);
+  }
+
+  /**
+   * @summary Descargar un informe PDF de asignaciones de vehículos
+   * @description Descarga un informe en formato PDF que contiene la información de las asignaciones de vehículos a conductores.
+   * @param res Respuesta HTTP.
+   * @returns Archivo PDF descargado.
+   */
+  @Get('pdf/download')
+  @ApiOperation({
+    summary: 'Descargar un informe PDF de asignaciones de vehículos',
+    description:
+      'Descarga un informe en formato PDF que contiene la información de las asignaciones de vehículos a conductores.',
+  })
+  @ApiResponse({
+    status: 200,
+    description:
+      'Archivo PDF de asignaciones de vehículos descargado exitosamente.',
+  })
+  @ApiResponse({
+    status: 500,
+    description:
+      'Error interno del servidor al generar el informe PDF de asignaciones de vehículos.',
+  })
+  async downloadPDF(@Res() res): Promise<void> {
+    try {
+      const buffer = await this.assignVehiclesService.generateReportPDF();
+
+      res.set({
+        'Content-Type': 'application/pdf',
+        'Content-Disposition':
+          'attachment; filename=informe-asignaciones-vehiculos.pdf',
+        'Content-Length': buffer.length.toString(),
+      });
+
+      res.end(buffer);
+    } catch (error) {
+      res.status(500).json({
+        error:
+          'Error interno del servidor al generar el informe PDF de asignaciones de vehículos.',
+      });
+    }
   }
 }

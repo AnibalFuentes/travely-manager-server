@@ -1,4 +1,11 @@
-import { Controller, Get, Param, ParseUUIDPipe, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Query,
+  Res,
+} from '@nestjs/common';
 import { LoginsService } from './logins.service';
 import {
   ApiBearerAuth,
@@ -75,5 +82,44 @@ export class LoginsController {
   @ApiResponse({ status: 400, description: 'Solicitud incorrecta' })
   findLoginsByUserId(@Param('userId', ParseUUIDPipe) userId: string) {
     return this.loginsService.findLoginsByUserId(userId);
+  }
+
+  /**
+   * @summary Descargar un informe PDF de inicios de sesión
+   * @description Descarga un informe en formato PDF que contiene la información de los inicios de sesión.
+   * @param res Respuesta HTTP.
+   * @returns Archivo PDF descargado.
+   */
+  @Get('pdf/download')
+  @ApiOperation({
+    summary: 'Descargar un informe PDF de inicios de sesión',
+    description:
+      'Descarga un informe en formato PDF que contiene la información de los inicios de sesión.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Archivo PDF descargado exitosamente.',
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Error interno del servidor al generar el informe PDF.',
+  })
+  async downloadPDF(@Res() res): Promise<void> {
+    try {
+      const buffer = await this.loginsService.generateReportPDF();
+
+      res.set({
+        'Content-Type': 'application/pdf',
+        'Content-Disposition':
+          'attachment; filename=informe-inicios-sesion.pdf',
+        'Content-Length': buffer.length.toString(),
+      });
+
+      res.end(buffer);
+    } catch (error) {
+      res.status(500).json({
+        error: 'Error interno del servidor al generar el informe PDF.',
+      });
+    }
   }
 }

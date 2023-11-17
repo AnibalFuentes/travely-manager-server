@@ -8,6 +8,7 @@ import {
   Delete,
   Query,
   ParseUUIDPipe,
+  Res,
 } from '@nestjs/common';
 import { EmployeesDriversService } from './employees-drivers.service';
 import { CreateEmployeeDriverDto } from './dto/create-employee-driver.dto';
@@ -122,5 +123,43 @@ export class EmployeesDriversController {
   @ApiResponse({ status: 404, description: 'Conductor no encontrado.' })
   remove(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
     return this.employeesDriversService.remove(id);
+  }
+
+  /**
+   * @summary Descargar un informe PDF de conductores
+   * @description Descarga un informe en formato PDF que contiene la información de los conductores.
+   * @param res Respuesta HTTP.
+   * @returns Archivo PDF descargado.
+   */
+  @Get('pdf/download')
+  @ApiOperation({
+    summary: 'Descargar un informe PDF de conductores',
+    description:
+      'Descarga un informe en formato PDF que contiene la información de los conductores.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Archivo PDF descargado exitosamente.',
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Error interno del servidor al generar el informe PDF.',
+  })
+  async downloadPDF(@Res() res): Promise<void> {
+    try {
+      const buffer = await this.employeesDriversService.generateReportPDF();
+
+      res.set({
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': 'attachment; filename=informe-conductores.pdf',
+        'Content-Length': buffer.length.toString(),
+      });
+
+      res.end(buffer);
+    } catch (error) {
+      res.status(500).json({
+        error: 'Error interno del servidor al generar el informe PDF.',
+      });
+    }
   }
 }

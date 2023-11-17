@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   ParseUUIDPipe,
+  Res,
 } from '@nestjs/common';
 import { BrandsService } from './brands.service';
 import { CreateBrandDto } from './dto/create-brand.dto';
@@ -134,5 +135,43 @@ export class BrandsController {
   @ApiResponse({ status: 404, description: 'Marca no encontrada' })
   remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.brandsService.remove(id);
+  }
+
+  /**
+   * @summary Descargar un informe PDF de marcas
+   * @description Descarga un informe en formato PDF que contiene la información de las marcas.
+   * @param res Respuesta HTTP.
+   * @returns Archivo PDF descargado.
+   */
+  @Get('pdf/download')
+  @ApiOperation({
+    summary: 'Descargar un informe PDF de marcas',
+    description:
+      'Descarga un informe en formato PDF que contiene la información de las marcas.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Archivo PDF descargado exitosamente.',
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Error interno del servidor al generar el informe PDF.',
+  })
+  async downloadPDF(@Res() res): Promise<void> {
+    try {
+      const buffer = await this.brandsService.generateReportPDF();
+
+      res.set({
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': 'attachment; filename=informe-marcas.pdf',
+        'Content-Length': buffer.length.toString(),
+      });
+
+      res.end(buffer);
+    } catch (error) {
+      res.status(500).json({
+        error: 'Error interno del servidor al generar el informe PDF.',
+      });
+    }
   }
 }

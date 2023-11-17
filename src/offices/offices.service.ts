@@ -12,6 +12,9 @@ import { Office } from './entities/office.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { validate as isUUID } from 'uuid';
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const PDFDocument = require('pdfkit-table');
+
 @Injectable()
 export class OfficesService {
   private readonly logger = new Logger('OfficesService');
@@ -82,6 +85,32 @@ export class OfficesService {
   async remove(id: string) {
     const office = await this.findOne(id);
     await this.officeRepository.remove(office);
+  }
+
+  async generateReportPDF(): Promise<Buffer> {
+    const pdfBuffer: Buffer = await new Promise((resolve) => {
+      const doc = new PDFDocument({
+        size: 'LETTER',
+        bufferPages: true,
+      });
+
+      //todo
+      doc.text('PDF Generado en nuestro servidor');
+      doc.moveDown();
+      doc.text(
+        'Esto es un ejemplo de como generar un pdf en nuestro servidor nestjs',
+      );
+
+      const buffer = [];
+      doc.on('data', buffer.push.bind(buffer));
+      doc.on('end', () => {
+        const data = Buffer.concat(buffer);
+        resolve(data);
+      });
+      doc.end();
+    });
+
+    return pdfBuffer;
   }
 
   private handleExceptions(error: any) {
