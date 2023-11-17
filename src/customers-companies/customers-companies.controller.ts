@@ -182,4 +182,121 @@ export class CustomersCompaniesController {
       });
     }
   }
+
+  /**
+   * @summary Descargar un informe PDF de clientes de tipo empresa registrados hoy
+   * @description Descarga un informe en formato PDF que contiene la información de los clientes de tipo empresa registrados hoy.
+   * @param res Respuesta HTTP.
+   * @returns Archivo PDF descargado.
+   */
+  @Get('pdf/download/today')
+  @ApiOperation({
+    summary:
+      'Descargar un informe PDF de clientes de tipo empresa registrados hoy',
+    description:
+      'Descarga un informe en formato PDF que contiene la información de los clientes de tipo empresa registrados hoy.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Archivo PDF descargado exitosamente.',
+  })
+  @ApiResponse({
+    status: 404,
+    description:
+      'No hay clientes de tipo empresa registrados hoy. No se generó ningún informe.',
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Error interno del servidor al generar el informe PDF.',
+  })
+  async downloadTodayPDF(@Res() res): Promise<void> {
+    try {
+      const buffer =
+        await this.customersCompaniesService.generateCustomerCompanyReportTodayPDF();
+
+      res.set({
+        'Content-Type': 'application/pdf',
+        'Content-Disposition':
+          'attachment; filename=informe-clientes-empresas-hoy.pdf',
+        'Content-Length': buffer.length.toString(),
+      });
+
+      res.end(buffer);
+    } catch (error) {
+      if (error.response && error.response.status === 404) {
+        res.status(404).json({
+          error:
+            'No hay clientes de tipo empresa registrados hoy. No se generó ningún informe.',
+        });
+      } else {
+        res.status(500).json({
+          error: 'Error interno del servidor al generar el informe PDF.',
+        });
+      }
+    }
+  }
+
+  /**
+   * @summary Descargar un informe PDF de clientes de tipo empresa por fecha de creación
+   * @description Descarga un informe en formato PDF que contiene la información de los clientes de tipo empresa creados en una fecha específica.
+   * @param date Fecha específica para filtrar los clientes de tipo empresa (en formato YYYY-MM-DD).
+   * @param res Respuesta HTTP.
+   * @returns Archivo PDF descargado.
+   */
+  @Get('pdf/download/by-creation-date')
+  @ApiOperation({
+    summary:
+      'Descargar un informe PDF de clientes de tipo empresa por fecha de creación',
+    description:
+      'Descarga un informe en formato PDF que contiene la información de los clientes de tipo empresa creados en una fecha específica.',
+  })
+  @ApiParam({
+    name: 'date',
+    description:
+      'Fecha específica para filtrar los clientes de tipo empresa (en formato YYYY-MM-DD)',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Archivo PDF descargado exitosamente.',
+  })
+  @ApiResponse({
+    status: 404,
+    description:
+      'No hay clientes de tipo empresa creados en la fecha especificada. No se generó ningún informe.',
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Error interno del servidor al generar el informe PDF.',
+  })
+  async downloadByCreationDatePDF(
+    @Query('date') date: string,
+    @Res() res,
+  ): Promise<void> {
+    try {
+      const buffer =
+        await this.customersCompaniesService.generateCustomerCompanyReportByCreationDatePDF(
+          new Date(date),
+        );
+
+      res.set({
+        'Content-Type': 'application/pdf',
+        'Content-Disposition':
+          'attachment; filename=informe-clientes-empresas-creados-en-fecha.pdf',
+        'Content-Length': buffer.length.toString(),
+      });
+
+      res.end(buffer);
+    } catch (error) {
+      if (error.response && error.response.status === 404) {
+        res.status(404).json({
+          error:
+            'No hay clientes de tipo empresa creados en la fecha especificada. No se generó ningún informe.',
+        });
+      } else {
+        res.status(500).json({
+          error: 'Error interno del servidor al generar el informe PDF.',
+        });
+      }
+    }
+  }
 }

@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { CreateCustomerCompanyDto } from './dto/create-customer-company.dto';
 import { UpdateCustomerCompanyDto } from './dto/update-customer-company.dto';
-import { Repository } from 'typeorm';
+import { Between, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CustomerCompany } from './entities/customer-company.entity';
 import { CompaniesService } from 'src/companies/companies.service';
@@ -156,7 +156,78 @@ export class CustomersCompaniesService {
     }
   }
 
+  async generateCustomerCompanyReportTodayPDF(): Promise<Buffer> {
+    const currentDate = new Date();
+    const startOfDay = new Date(currentDate.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(currentDate.setHours(23, 59, 59, 999));
+
+    const customerCompanies = await this.customerCompanyRepository.find({
+      where: {
+        createdAt: Between(startOfDay, endOfDay),
+      },
+      relations: ['company'],
+    });
+
+    if (customerCompanies.length === 0) {
+      throw new NotFoundException(
+        'No hay clientes de tipo empresa registrados hoy. No se generó ningún informe.',
+      );
+    }
+
+    return this.generateCustomerCompanyReportPDFWithCustomers(
+      customerCompanies,
+      'Clientes de Tipo Empresa Registrados Hoy',
+    );
+  }
+
+  async generateCustomerCompanyReportByCreationDatePDF(
+    creationDate: Date,
+  ): Promise<Buffer> {
+    const startOfDay = new Date(creationDate.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(creationDate.setHours(23, 59, 59, 999));
+
+    const customerCompanies = await this.customerCompanyRepository.find({
+      where: {
+        createdAt: Between(startOfDay, endOfDay),
+      },
+      relations: ['company'],
+    });
+
+    if (customerCompanies.length === 0) {
+      throw new NotFoundException(
+        `No hay clientes de tipo empresa creados en la fecha especificada. No se generó ningún informe.`,
+      );
+    }
+
+    return this.generateCustomerCompanyReportPDFWithCustomers(
+      customerCompanies,
+      `Clientes de Tipo Empresa Registrados el ${this.formatDate(
+        creationDate,
+      )}`,
+    );
+  }
+
   async generateCustomerCompanyReportPDF(): Promise<Buffer> {
+    const customerCompanies = await this.customerCompanyRepository.find({
+      relations: ['company'],
+    });
+
+    if (customerCompanies.length === 0) {
+      throw new NotFoundException(
+        'No hay clientes de tipo empresa registrados. No se generó ningún informe.',
+      );
+    }
+
+    return this.generateCustomerCompanyReportPDFWithCustomers(
+      customerCompanies,
+      'Informe de Clientes de Tipo Empresa',
+    );
+  }
+
+  private async generateCustomerCompanyReportPDFWithCustomers(
+    customerCompanies: CustomerCompany[],
+    title: string,
+  ): Promise<Buffer> {
     const pdfBuffer: Buffer = await new Promise(async (resolve) => {
       const doc = new PDFDocument({
         size: 'LETTER',
@@ -165,7 +236,6 @@ export class CustomersCompaniesService {
 
       // Configuración del documento
       const currentDate = new Date().toLocaleString();
-      const title = 'Informe de Clientes de Tipo Empresa';
       const pageMargins = 50;
 
       // Configuración del encabezado
@@ -174,11 +244,6 @@ export class CustomersCompaniesService {
       doc
         .fontSize(12)
         .text(`Fecha de generación: ${currentDate}`, { align: 'center' });
-
-      // Obtener todos los clientes de tipo empresa desde la base de datos
-      const customers = await this.customerCompanyRepository.find({
-        relations: ['company'],
-      });
 
       // Configuración de la tabla
       const customerCompanyTable = {
@@ -191,7 +256,7 @@ export class CustomersCompaniesService {
           'Número de Contacto',
           'Fecha de Creación',
         ],
-        rows: customers.map((customer, index) => [
+        rows: customerCompanies.map((customer, index) => [
           index + 1,
           customer.company.name,
           customer.company.nit,

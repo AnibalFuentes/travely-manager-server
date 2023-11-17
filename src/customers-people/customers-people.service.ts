@@ -8,7 +8,7 @@ import { CreateCustomerPersonDto } from './dto/create-customer-person.dto';
 import { UpdateCustomerPersonDto } from './dto/update-customer-person.dto';
 import { PeopleService } from 'src/people/people.service';
 import { CustomerPerson } from './entities/customer-person.entity';
-import { Repository } from 'typeorm';
+import { Between, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
 
@@ -249,6 +249,144 @@ export class CustomersPeopleService {
 
     return pdfBuffer;
   }
+
+  async generateCustomerPersonReportTodayPDF(): Promise<Buffer> {
+    const currentDate = new Date();
+    const startOfDay = new Date(currentDate.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(currentDate.setHours(23, 59, 59, 999));
+
+    const users = await this.customerPersonRepository.find({
+      where: {
+        createdAt: Between(startOfDay, endOfDay),
+      },
+    });
+
+    if (users.length === 0) {
+      throw new NotFoundException(
+        'No hay usuarios registrados hoy. No se generó ningún informe.',
+      );
+    }
+
+    return this.generateCustomerPersonReportPDFWithUsers(
+      users,
+      'Usuarios Registrados Hoy',
+    );
+  }
+
+  async generateCustomerPersonReportByCreationDatePDF(
+    creationDate: Date,
+  ): Promise<Buffer> {
+    const startOfDay = new Date(creationDate.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(creationDate.setHours(23, 59, 59, 999));
+
+    const users = await this.customerPersonRepository.find({
+      where: {
+        createdAt: Between(startOfDay, endOfDay),
+      },
+    });
+
+    if (users.length === 0) {
+      throw new NotFoundException(
+        `No hay usuarios registrados en la fecha especificada. No se generó ningún informe.`,
+      );
+    }
+
+    return this.generateCustomerPersonReportPDFWithUsers(
+      users,
+      `Usuarios Registrados en ${this.formatDate(creationDate)}`,
+    );
+  }
+
+  private async generateCustomerPersonReportPDFWithUsers(
+    customerPeople: CustomerPerson[],
+    title: string,
+  ): Promise<Buffer> {
+    const pdfBuffer: Buffer = await new Promise(async (resolve) => {
+      const doc = new PDFDocument({
+        size: 'LETTER',
+        bufferPages: true,
+      });
+
+      // Configuración del documento
+      const currentDate = new Date().toLocaleString();
+      const pageMargins = 50;
+
+      // Configuración del encabezado
+      doc.font('Helvetica-Bold').fontSize(18).text(title, { align: 'center' });
+      doc.moveDown();
+      doc
+        .fontSize(12)
+        .text(`Fecha de generación: ${currentDate}`, { align: 'center' });
+
+      // Configuración de la tabla
+      const customerPersonTable = {
+        title: 'Tabla de Clientes de Tipo Persona',
+        headers: [
+          'Nº',
+          'Nombre',
+          'Tipo de Documento',
+          'Número de Identificación',
+          'Fecha de Creación',
+        ],
+        rows: customerPeople.map((customerPerson, index) => [
+          index + 1,
+          `${customerPerson.person.firstName} ${customerPerson.person.lastName}`,
+          customerPerson.person.documentType,
+          customerPerson.person.identificationNumber,
+          this.formatDate(customerPerson.createdAt),
+        ]),
+      };
+
+      // Calcular el ancho de la tabla
+      const availableWidth = doc.page.width - pageMargins * 2;
+      const columnsSize = customerPersonTable.headers.map(
+        () => availableWidth / customerPersonTable.headers.length,
+      );
+
+      // Centrar la tabla en el documento
+      const tableX = pageMargins;
+
+      // Agregar la tabla al informe
+      doc.moveDown();
+      doc.table(customerPersonTable, {
+        x: tableX,
+        columnsSize,
+      });
+
+      // Configuración del pie de página
+      const totalPages = doc.bufferedPageRange().count;
+      for (let i = 0; i < totalPages; i++) {
+        doc.switchToPage(i);
+
+        // Agregar el paginado al final de la página
+        doc
+          .fontSize(10)
+          .text(
+            `Página ${i + 1} de ${totalPages}`,
+            doc.page.width / 2,
+            doc.page.height - pageMargins,
+            { align: 'center' },
+          );
+      }
+
+      // Agregar línea adicional al final del documento
+      doc.moveDown();
+      doc
+        .fontSize(12)
+        .text('Reporte generado por Travely Manager', { align: 'center' });
+
+      const buffer = [];
+      doc.on('data', buffer.push.bind(buffer));
+      doc.on('end', () => {
+        const data = Buffer.concat(buffer);
+        resolve(data);
+      });
+      doc.end();
+    });
+
+    return pdfBuffer;
+  }
+
   // Función para formatear la fecha en el formato deseado
   private formatDate(date: Date): string {
     const year = date.getFullYear();

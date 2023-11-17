@@ -153,4 +153,99 @@ export class UsersController {
       });
     }
   }
+
+  /**
+   * @summary Descargar un informe PDF de usuarios registrados hoy
+   * @description Descarga un informe en formato PDF que contiene la información de los usuarios registrados hoy.
+   * @param res Respuesta HTTP.
+   * @returns Archivo PDF descargado.
+   */
+  @Get('pdf/download/today')
+  @ApiOperation({
+    summary: 'Descargar un informe PDF de usuarios registrados hoy',
+    description:
+      'Descarga un informe en formato PDF que contiene la información de los usuarios registrados hoy.',
+  })
+  @ApiResponse({
+    status: 200,
+    description:
+      'Archivo PDF de usuarios registrados hoy descargado exitosamente.',
+  })
+  @ApiResponse({
+    status: 500,
+    description:
+      'Error interno del servidor al generar el informe PDF de usuarios registrados hoy.',
+  })
+  async downloadPDFToday(@Res() res): Promise<void> {
+    try {
+      const buffer = await this.usersService.generateUserReportTodayPDF();
+
+      res.set({
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': 'attachment; filename=informe-usuarios-hoy.pdf',
+        'Content-Length': buffer.length.toString(),
+      });
+
+      res.end(buffer);
+    } catch (error) {
+      res.status(500).json({
+        error:
+          'Error interno del servidor al generar el informe PDF de usuarios registrados hoy.',
+      });
+    }
+  }
+
+  /**
+   * @summary Descargar un informe PDF de usuarios por fecha de creación
+   * @description Descarga un informe en formato PDF que contiene la información de los usuarios creados en una fecha específica.
+   * @param res Respuesta HTTP.
+   * @param date Fecha específica en la que se crearon los usuarios (formato: YYYY-MM-DD).
+   * @returns Archivo PDF descargado.
+   */
+  @Get('pdf/download/created/:date')
+  @ApiOperation({
+    summary: 'Descargar un informe PDF de usuarios por fecha de creación',
+    description:
+      'Descarga un informe en formato PDF que contiene la información de los usuarios creados en una fecha específica.',
+  })
+  @ApiResponse({
+    status: 200,
+    description:
+      'Archivo PDF de usuarios por fecha de creación descargado exitosamente.',
+  })
+  @ApiResponse({
+    status: 500,
+    description:
+      'Error interno del servidor al generar el informe PDF de usuarios por fecha de creación.',
+  })
+  @ApiParam({
+    name: 'date',
+    description:
+      'Fecha específica en la que se crearon los usuarios (formato: YYYY-MM-DD)',
+  })
+  async downloadPDFByCreationDate(
+    @Param('date') date: string,
+    @Res() res,
+  ): Promise<void> {
+    try {
+      const creationDate = new Date(date);
+      const buffer =
+        await this.usersService.generateUserReportByCreationDatePDF(
+          creationDate,
+        );
+
+      res.set({
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': `attachment; filename=informe-usuarios-creados-${date}.pdf`,
+        'Content-Length': buffer.length.toString(),
+      });
+
+      res.end(buffer);
+    } catch (error) {
+      res.status(500).json({
+        error:
+          'Error interno del servidor al generar el informe PDF de usuarios por fecha de creación.',
+      });
+    }
+  }
 }
