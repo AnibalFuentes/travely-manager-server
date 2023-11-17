@@ -277,7 +277,7 @@ export class VehiclesController {
   })
   async downloadPDF(@Res() res): Promise<void> {
     try {
-      const buffer = await this.vehiclesService.generateReportPDF();
+      const buffer = await this.vehiclesService.generateVehicleReportPDF();
 
       res.set({
         'Content-Type': 'application/pdf',

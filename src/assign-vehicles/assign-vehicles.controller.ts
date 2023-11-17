@@ -155,7 +155,8 @@ export class AssignVehiclesController {
   })
   async downloadPDF(@Res() res): Promise<void> {
     try {
-      const buffer = await this.assignVehiclesService.generateReportPDF();
+      const buffer =
+        await this.assignVehiclesService.generateAssignVehicleReportPDF();
 
       res.set({
         'Content-Type': 'application/pdf',
