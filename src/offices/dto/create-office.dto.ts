@@ -19,6 +19,13 @@ export class CreateOfficeDto {
   name: string;
 
   @ApiProperty({
+    description: 'Dirección de la oficina',
+    example: '123 Main Street, Cityville',
+  })
+  @IsNotEmpty()
+  address: string;
+
+  @ApiProperty({
     description: 'ID de la ubicación asociada a la oficina',
     example: 'e87ef3f1-1f2a-4b6f-b381-4ea3c40b6d3a',
   })

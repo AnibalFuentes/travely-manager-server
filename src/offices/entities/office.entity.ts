@@ -28,6 +28,13 @@ export class Office {
   })
   name: string;
 
+  @Column()
+  @ApiProperty({
+    description: 'Dirección de la oficina',
+    example: '123 Main Street, Cityville',
+  })
+  address: string;
+
   @ManyToOne(() => Location, (location) => location.id, {
     eager: true,
   })
