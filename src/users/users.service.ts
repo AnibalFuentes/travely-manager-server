@@ -9,7 +9,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { validate as isUUID } from 'uuid';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Between, Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -96,6 +96,61 @@ export class UsersService {
   }
 
   async generateUserReportPDF(): Promise<Buffer> {
+    const users = await this.userRepository.find();
+    return this.generateUserReportPDFWithUsers(users, 'Informe de Usuarios');
+  }
+
+  async generateUserReportTodayPDF(): Promise<Buffer> {
+    const currentDate = new Date();
+    const startOfDay = new Date(currentDate.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(currentDate.setHours(23, 59, 59, 999));
+
+    const users = await this.userRepository.find({
+      where: {
+        createdAt: Between(startOfDay, endOfDay),
+      },
+    });
+
+    if (users.length === 0) {
+      throw new NotFoundException(
+        'No hay usuarios registrados hoy. No se generó ningún informe.',
+      );
+    }
+
+    return this.generateUserReportPDFWithUsers(
+      users,
+      'Usuarios Registrados Hoy',
+    );
+  }
+
+  async generateUserReportByCreationDatePDF(
+    creationDate: Date,
+  ): Promise<Buffer> {
+    const startOfDay = new Date(creationDate.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(creationDate.setHours(23, 59, 59, 999));
+
+    const users = await this.userRepository.find({
+      where: {
+        createdAt: Between(startOfDay, endOfDay),
+      },
+    });
+
+    if (users.length === 0) {
+      throw new NotFoundException(
+        `No hay usuarios creados en la fecha especificada. No se generó ningún informe.`,
+      );
+    }
+
+    return this.generateUserReportPDFWithUsers(
+      users,
+      `Usuarios Registrados el ${this.formatDate(creationDate)}`,
+    );
+  }
+
+  private async generateUserReportPDFWithUsers(
+    users: User[],
+    title: string,
+  ): Promise<Buffer> {
     const pdfBuffer: Buffer = await new Promise(async (resolve) => {
       const doc = new PDFDocument({
         size: 'LETTER',
@@ -104,7 +159,6 @@ export class UsersService {
 
       // Configuración del documento
       const currentDate = new Date().toLocaleString();
-      const title = 'Informe de Usuarios';
       const pageMargins = 50;
 
       // Configuración del encabezado
@@ -113,9 +167,6 @@ export class UsersService {
       doc
         .fontSize(12)
         .text(`Fecha de generación: ${currentDate}`, { align: 'center' });
-
-      // Obtener todos los usuarios desde la base de datos
-      const users = await this.userRepository.find();
 
       // Configuración de la tabla
       const userTable = {
