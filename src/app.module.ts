@@ -21,6 +21,7 @@ import { EmployeesSellersModule } from './employees-sellers/employees-sellers.mo
 import { TravelsModule } from './travels/travels.module';
 import { SeedModule } from './seed/seed.module';
 import { LoginsModule } from './logins/logins.module';
+import { EmployeesAdminsModule } from './employees-admins/employees-admins.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { LoginsModule } from './logins/logins.module';
     SalesModule,
     AssignVehiclesModule,
     EmployeesModule,
+    EmployeesAdminsModule,
     EmployeesChiefsModule,
     EmployeesDriversModule,
     EmployeesSellersModule,
