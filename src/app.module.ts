@@ -18,8 +18,6 @@ import { EmployeesDriversModule } from './employees-drivers/employees-drivers.mo
 import { EmployeesChiefsModule } from './employees-chiefs/employees-chiefs.module';
 import { PassengersModule } from './passengers/passengers.module';
 import { EmployeesSellersModule } from './employees-sellers/employees-sellers.module';
-import { CustomersCompaniesModule } from './customers-companies/customers-companies.module';
-import { CustomersPeopleModule } from './customers-people/customers-people.module';
 import { TravelsModule } from './travels/travels.module';
 import { SeedModule } from './seed/seed.module';
 import { LoginsModule } from './logins/logins.module';
@@ -53,8 +51,6 @@ import { LoginsModule } from './logins/logins.module';
     EmployeesChiefsModule,
     EmployeesDriversModule,
     EmployeesSellersModule,
-    CustomersCompaniesModule,
-    CustomersPeopleModule,
     PassengersModule,
     TravelsModule,
     SeedModule,
