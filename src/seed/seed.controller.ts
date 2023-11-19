@@ -21,18 +21,18 @@ export class SeedController {
    * @description Inicia el proceso de carga de datos para poblar el sistema con datos iniciales.
    * @returns Completado con éxito el proceso de carga de datos.
    */
-  @Get()
-  @ApiOperation({
-    summary: 'Ejecutar el proceso de carga inicial de datos',
-    description:
-      'Inicia el proceso de carga de datos para poblar el sistema con datos iniciales.',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Proceso de carga de datos completado con éxito.',
-  })
-  @ApiResponse({ status: 500, description: 'Error interno del servidor' })
-  execute() {
-    return this.seedService.run();
-  }
+  //@Get()
+  //@ApiOperation({
+  //  summary: 'Ejecutar el proceso de carga inicial de datos',
+  //  description:
+  //    'Inicia el proceso de carga de datos para poblar el sistema con datos iniciales.',
+  //})
+  //@ApiResponse({
+  //  status: 200,
+  //  description: 'Proceso de carga de datos completado con éxito.',
+  //})
+  //@ApiResponse({ status: 500, description: 'Error interno del servidor' })
+  //execute() {
+  //  return this.seedService.run();
+  //}
 }
