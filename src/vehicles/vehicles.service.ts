@@ -281,6 +281,10 @@ export class VehiclesService {
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
   }
 
+  async countActiveVehicles(): Promise<number> {
+    return this.vehicleRepository.count({ where: { isActive: true } });
+  }
+
   private handleExceptions(error: any) {
     this.logger.error(error);
 
