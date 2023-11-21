@@ -72,4 +72,63 @@ export class TravelSalesController {
   findAll(@Query() paginationDto: PaginationDto) {
     return this.travelSalesService.findAll(paginationDto);
   }
+
+  /**
+   * @summary Obtener la cantidad de ventas de viajes
+   * @description Recupera la cantidad de ventas de viajes en el sistema.
+   * @returns Cantidad de ventas de viajes recuperada exitosamente.
+   */
+  @Get('active/count')
+  @ApiOperation({
+    summary: 'Obtener la cantidad de ventas de viajes',
+    description: 'Recupera la cantidad de ventas de viajes en el sistema.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Cantidad de ventas de viajes recuperada exitosamente.',
+  })
+  async getActiveUsersCount() {
+    const activeUsersCount = await this.travelSalesService.count();
+    return { activeUsersCount };
+  }
+
+  /**
+   * @summary Obtener el dinero total pagado de las ventas del día
+   * @description Recupera el dinero total pagado de las ventas del día.
+   * @returns Dinero total pagado de las ventas del día recuperado exitosamente.
+   */
+  @Get('total-paid/today')
+  @ApiOperation({
+    summary: 'Obtener el dinero total pagado de las ventas del día',
+    description: 'Recupera el dinero total pagado de las ventas del día.',
+  })
+  @ApiResponse({
+    status: 200,
+    description:
+      'Dinero total pagado de las ventas del día recuperado exitosamente.',
+  })
+  async getTotalPaidToday() {
+    const totalPaidToday = await this.travelSalesService.getTotalPaidToday();
+    return { totalPaidToday };
+  }
+
+  /**
+   * @summary Obtener el dinero total pagado de todas las ventas
+   * @description Recupera el dinero total pagado de todas las ventas.
+   * @returns Dinero total pagado de todas las ventas recuperado exitosamente.
+   */
+  @Get('total-paid')
+  @ApiOperation({
+    summary: 'Obtener el dinero total pagado de todas las ventas',
+    description: 'Recupera el dinero total pagado de todas las ventas.',
+  })
+  @ApiResponse({
+    status: 200,
+    description:
+      'Dinero total pagado de todas las ventas recuperado exitosamente.',
+  })
+  async getTotalPaid() {
+    const totalPaid = await this.travelSalesService.getTotalPaid();
+    return { totalPaid };
+  }
 }
