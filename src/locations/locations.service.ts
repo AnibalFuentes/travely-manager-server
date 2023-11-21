@@ -9,7 +9,7 @@ import { Location } from './entities/location.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateLocationDto } from './dto/create-location.dto';
-
+import { validate as isUUID } from 'uuid';
 @Injectable()
 export class LocationsService {
   private readonly logger = new Logger('LocationsService');
@@ -51,7 +51,7 @@ export class LocationsService {
   async getCitiesByDepartment(department: string) {
     const cities = await this.locationRepository
       .createQueryBuilder()
-      .select('city')
+      .select(['id', 'city']) // Agregar 'id' a la selección
       .where('department = :department', { department })
       .execute();
 
@@ -61,7 +61,7 @@ export class LocationsService {
       );
     }
 
-    return cities.map((result) => result.city);
+    return cities;
   }
 
   /**
@@ -158,6 +158,31 @@ export class LocationsService {
         );
       }
     }
+  }
+
+  async findOne(term: string) {
+    let location: Location;
+
+    if (isUUID(term)) {
+      location = await this.locationRepository.findOneBy({ id: term });
+    } else {
+      const queryBuilder =
+        this.locationRepository.createQueryBuilder('location');
+      location = await queryBuilder
+        .where('LOWER(location.city) = :term', {
+          term: term.toLowerCase(),
+        })
+        .orWhere('LOWER(location.department) = :term', {
+          term: term.toLowerCase(),
+        })
+        .getOne();
+    }
+
+    if (!location) {
+      throw new NotFoundException(`Ubicación con ${term} no encontrada`);
+    }
+
+    return location;
   }
 
   async removeAll() {

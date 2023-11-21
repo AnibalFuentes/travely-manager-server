@@ -12,16 +12,15 @@ import { LocationsModule } from './locations/locations.module';
 import { OfficesModule } from './offices/offices.module';
 import { CompaniesModule } from './companies/companies.module';
 import { PeopleModule } from './people/people.module';
-import { SalesModule } from './sales/sales.module';
-import { AssignVehiclesModule } from './assign-vehicles/assign-vehicles.module';
 import { EmployeesDriversModule } from './employees-drivers/employees-drivers.module';
 import { EmployeesChiefsModule } from './employees-chiefs/employees-chiefs.module';
 import { PassengersModule } from './passengers/passengers.module';
-import { EmployeesSellersModule } from './employees-sellers/employees-sellers.module';
-import { TravelsModule } from './travels/travels.module';
 import { SeedModule } from './seed/seed.module';
 import { LoginsModule } from './logins/logins.module';
-import { EmployeesAdminsModule } from './employees-admins/employees-admins.module';
+import { EmployeesOfficesModule } from './employees-offices/employees-offices.module';
+import { DriversVehiclesModule } from './drivers-vehicles/drivers-vehicles.module';
+import { PassengersTravelSalesModule } from './passengers-travel-sales/passengers-travel-sales.module';
+import { TravelSalesModule } from './travel-sales/travel-sales.module';
 
 @Module({
   imports: [
@@ -46,17 +45,16 @@ import { EmployeesAdminsModule } from './employees-admins/employees-admins.modul
     OfficesModule,
     CompaniesModule,
     PeopleModule,
-    SalesModule,
-    AssignVehiclesModule,
     EmployeesModule,
-    EmployeesAdminsModule,
     EmployeesChiefsModule,
     EmployeesDriversModule,
-    EmployeesSellersModule,
     PassengersModule,
-    TravelsModule,
     SeedModule,
     LoginsModule,
+    EmployeesOfficesModule,
+    DriversVehiclesModule,
+    PassengersTravelSalesModule,
+    TravelSalesModule,
   ],
   controllers: [],
   providers: [],

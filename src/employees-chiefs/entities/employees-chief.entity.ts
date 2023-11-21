@@ -1,12 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Employee } from 'src/employees/entities/employee.entity';
-import { Office } from 'src/offices/entities/office.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
   JoinColumn,
-  ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -23,9 +21,6 @@ export class EmployeeChief {
   @OneToOne(() => Employee, { cascade: true })
   @JoinColumn()
   employee: Employee;
-
-  @ManyToOne(() => Office, (office) => office.chiefs)
-  office: Office;
 
   @Column({ type: 'boolean', default: true })
   @ApiProperty({

@@ -55,14 +55,10 @@ export class CreateVehicleDto {
   @Max(new Date().getFullYear())
   manufacturingYear?: number;
 
-  @ApiProperty({
-    description: 'Número de asientos en el vehículo.',
-    example: 5,
-  })
+  @ApiProperty({ example: 'Autobus', description: 'tipo de vehículo' })
   @IsOptional()
-  @IsInt()
-  @Min(0)
-  numberOfSeats?: number;
+  @IsString()
+  type?: string;
 
   @ApiProperty({
     description: 'Identificador único de la marca del vehículo.',

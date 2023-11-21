@@ -7,7 +7,6 @@ import {
   Param,
   Delete,
   ParseUUIDPipe,
-  Res,
 } from '@nestjs/common';
 import { OfficesService } from './offices.service';
 import { CreateOfficeDto } from './dto/create-office.dto';
@@ -135,45 +134,5 @@ export class OfficesController {
   @ApiResponse({ status: 404, description: 'Oficina no encontrada' })
   remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.officesService.remove(id);
-  }
-
-  /**
-   * @summary Descargar un informe PDF de oficinas
-   * @description Descarga un informe en formato PDF que contiene la información de las oficinas.
-   * @param res Respuesta HTTP.
-   * @returns Archivo PDF descargado.
-   */
-  @Get('pdf/download')
-  @ApiOperation({
-    summary: 'Descargar un informe PDF de oficinas',
-    description:
-      'Descarga un informe en formato PDF que contiene la información de las oficinas.',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Archivo PDF de oficinas descargado exitosamente.',
-  })
-  @ApiResponse({
-    status: 500,
-    description:
-      'Error interno del servidor al generar el informe PDF de oficinas.',
-  })
-  async downloadPDF(@Res() res): Promise<void> {
-    try {
-      const buffer = await this.officesService.generateOfficeReportPDF();
-
-      res.set({
-        'Content-Type': 'application/pdf',
-        'Content-Disposition': 'attachment; filename=informe-oficinas.pdf',
-        'Content-Length': buffer.length.toString(),
-      });
-
-      res.end(buffer);
-    } catch (error) {
-      res.status(500).json({
-        error:
-          'Error interno del servidor al generar el informe PDF de oficinas.',
-      });
-    }
   }
 }
