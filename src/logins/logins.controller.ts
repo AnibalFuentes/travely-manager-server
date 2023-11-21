@@ -100,7 +100,7 @@ export class LoginsController {
   })
   async getloginsCount() {
     const loginsCount = await this.loginsService.countActive();
-    return { loginsCount: loginsCount };
+    return loginsCount;
   }
 
   /**

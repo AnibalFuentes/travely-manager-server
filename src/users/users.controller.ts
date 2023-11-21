@@ -130,7 +130,7 @@ export class UsersController {
   })
   async getActiveUsersCount() {
     const activeUsersCount = await this.usersService.countActiveUsers();
-    return { activeUsersCount };
+    return activeUsersCount;
   }
 
   /**

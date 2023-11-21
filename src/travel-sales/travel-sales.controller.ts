@@ -89,7 +89,7 @@ export class TravelSalesController {
   })
   async getActiveUsersCount() {
     const activeUsersCount = await this.travelSalesService.count();
-    return { activeUsersCount };
+    return activeUsersCount;
   }
 
   /**
@@ -109,7 +109,7 @@ export class TravelSalesController {
   })
   async getTotalPaidToday() {
     const totalPaidToday = await this.travelSalesService.getTotalPaidToday();
-    return { totalPaidToday };
+    return totalPaidToday;
   }
 
   /**
@@ -129,6 +129,6 @@ export class TravelSalesController {
   })
   async getTotalPaid() {
     const totalPaid = await this.travelSalesService.getTotalPaid();
-    return { totalPaid };
+    return totalPaid;
   }
 }

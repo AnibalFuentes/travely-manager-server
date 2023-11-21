@@ -270,7 +270,7 @@ export class VehiclesController {
   })
   async getActiveUsersCount() {
     const activeUsersCount = await this.vehiclesService.countActiveVehicles();
-    return { activeUsersCount };
+    return activeUsersCount;
   }
 
   /**

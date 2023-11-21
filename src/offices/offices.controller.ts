@@ -152,6 +152,6 @@ export class OfficesController {
   })
   async getActiveCount() {
     const activeOfficesCount = await this.officesService.countActiveOffices();
-    return { activeOfficesCount: activeOfficesCount };
+    return activeOfficesCount;
   }
 }
