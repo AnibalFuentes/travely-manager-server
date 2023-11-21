@@ -144,7 +144,7 @@ export class TravelSalesService {
   }
 
   async count(): Promise<number> {
-    return this.travelSaleRepository.count();
+    return this.travelSaleRepository.count({});
   }
 
   /**

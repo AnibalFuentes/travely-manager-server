@@ -129,6 +129,64 @@ export class CustomersController {
     return this.customersService.remove(id);
   }
 
+  /**
+   * @summary Obtener el total de clientes
+   * @description Obtiene el número total de clientes en el sistema.
+   * @returns Número total de clientes.
+   */
+  @Get('count')
+  @ApiOperation({
+    summary: 'Obtener el total de clientes',
+    description: 'Obtiene el número total de clientes en el sistema.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Número total de clientes obtenido exitosamente.',
+  })
+  getTotalCustomersCount() {
+    return this.customersService.countTotalCustomers();
+  }
+
+  /**
+   * @summary Obtener el total de clientes de tipo persona
+   * @description Obtiene el número total de clientes de tipo persona en el sistema.
+   * @returns Número total de clientes de tipo persona.
+   */
+  @Get('count/persons')
+  @ApiOperation({
+    summary: 'Obtener el total de clientes de tipo persona',
+    description:
+      'Obtiene el número total de clientes de tipo persona en el sistema.',
+  })
+  @ApiResponse({
+    status: 200,
+    description:
+      'Número total de clientes de tipo persona obtenido exitosamente.',
+  })
+  getTotalPersonCustomersCount() {
+    return this.customersService.countTotalPersonCustomers();
+  }
+
+  /**
+   * @summary Obtener el total de clientes de tipo empresa
+   * @description Obtiene el número total de clientes de tipo empresa en el sistema.
+   * @returns Número total de clientes de tipo empresa.
+   */
+  @Get('count/companies')
+  @ApiOperation({
+    summary: 'Obtener el total de clientes de tipo empresa',
+    description:
+      'Obtiene el número total de clientes de tipo empresa en el sistema.',
+  })
+  @ApiResponse({
+    status: 200,
+    description:
+      'Número total de clientes de tipo empresa obtenido exitosamente.',
+  })
+  getTotalCompanyCustomersCount() {
+    return this.customersService.countTotalCompanyCustomers();
+  }
+
   @Get('pdf/download')
   @ApiOperation({
     summary: 'Descargar un informe PDF de clientes',
