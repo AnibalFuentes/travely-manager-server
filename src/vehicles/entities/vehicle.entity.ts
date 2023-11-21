@@ -1,5 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { IsOptional, IsString } from 'class-validator';
 import { Brand } from 'src/brands/entities/brand.entity';
+import { VehicleType } from 'src/common/enums/vehicle-type.enum';
 import {
   Column,
   CreateDateColumn,
@@ -59,12 +61,9 @@ export class Vehicle {
   })
   numberOfSeats: number;
 
-  @Column({ type: 'boolean', default: true })
-  @ApiProperty({
-    description: 'Indica si el vehículo está activo o no.',
-    example: true,
-  })
-  isActive: boolean;
+  @ApiProperty({ example: 'Autobus', description: 'tipo de vehículo' })
+  @Column({ type: 'enum', enum: VehicleType, nullable: true })
+  type?: VehicleType;
 
   @ManyToOne(() => Brand, (brand) => brand.id, {
     eager: true,
@@ -74,6 +73,13 @@ export class Vehicle {
     type: () => Brand,
   })
   brand: Brand;
+
+  @Column({ type: 'boolean', default: true })
+  @ApiProperty({
+    description: 'Indica si el vehículo está activo o no.',
+    example: true,
+  })
+  isActive: boolean;
 
   @CreateDateColumn()
   @ApiProperty({

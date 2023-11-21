@@ -94,6 +94,7 @@ export class PeopleService {
       throw new NotFoundException(`Persona con ${term} no encontrada`);
     return person;
   }
+
   async update(id: string, updatePersonDto: UpdatePersonDto) {
     const person = await this.personRepository.preload({
       id: id,

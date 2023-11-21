@@ -11,9 +11,8 @@ import { Repository } from 'typeorm';
 import { Office } from './entities/office.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { validate as isUUID } from 'uuid';
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const PDFDocument = require('pdfkit-table');
+import { LocationsService } from 'src/locations/locations.service';
+import { EmployeesChiefsService } from '../employees-chiefs/employees-chiefs.service';
 
 @Injectable()
 export class OfficesService {
@@ -22,11 +21,28 @@ export class OfficesService {
   constructor(
     @InjectRepository(Office)
     private readonly officeRepository: Repository<Office>,
+    private readonly locationsService: LocationsService,
+    private readonly employeesChiefsService: EmployeesChiefsService,
   ) {}
 
   async create(createOfficeDto: CreateOfficeDto) {
-    const { name } = createOfficeDto;
+    const { name, locationId, chiefId } = createOfficeDto;
 
+    // Validar la existencia de la ubicación
+    const existingLocation = await this.locationsService.findOne(locationId);
+    if (!existingLocation) {
+      throw new NotFoundException('La ubicación especificada no existe.');
+    }
+
+    // Validar la existencia del jefe de la oficina
+    const existingChief = await this.employeesChiefsService.findOne(chiefId);
+    if (!existingChief) {
+      throw new NotFoundException(
+        'El jefe de la oficina especificado no existe.',
+      );
+    }
+
+    // Validar la existencia de una oficina con el mismo nombre
     const existingOffice = await this.officeRepository.findOne({
       where: { name },
     });
@@ -36,7 +52,12 @@ export class OfficesService {
     }
 
     try {
-      const office = this.officeRepository.create(createOfficeDto);
+      const office = this.officeRepository.create({
+        ...createOfficeDto,
+        location: existingLocation,
+        chief: existingChief,
+      });
+
       await this.officeRepository.save(office);
       return office;
     } catch (error) {
@@ -85,111 +106,6 @@ export class OfficesService {
   async remove(id: string) {
     const office = await this.findOne(id);
     await this.officeRepository.remove(office);
-  }
-
-  async generateOfficeReportPDF(): Promise<Buffer> {
-    const pdfBuffer: Buffer = await new Promise(async (resolve) => {
-      const doc = new PDFDocument({
-        size: 'LETTER',
-        bufferPages: true,
-      });
-
-      // Configuración del documento
-      const currentDate = new Date().toLocaleString();
-      const title = 'Informe de Oficinas';
-      const pageMargins = 50;
-
-      // Configuración del encabezado
-      doc.font('Helvetica-Bold').fontSize(18).text(title, { align: 'center' });
-      doc.moveDown();
-      doc
-        .fontSize(12)
-        .text(`Fecha de generación: ${currentDate}`, { align: 'center' });
-
-      // Obtener todas las oficinas desde la base de datos
-      const offices = await this.officeRepository.find({
-        relations: ['location', 'chiefs', 'drivers', 'sellers'],
-      });
-
-      // Configuración de la tabla
-      const officeTable = {
-        title: 'Tabla de Oficinas',
-        headers: [
-          'Nº',
-          'Nombre',
-          'Ubicación',
-          'Jefes de Empleado',
-          'Conductores',
-          'Vendedores',
-          'Activa',
-          'Fecha de Creación',
-        ],
-        rows: offices.map((office, index) => [
-          index + 1,
-          office.name,
-          office.location.city, // Ajustar según la estructura real de la entidad Location
-          office.chiefs
-            .map((chief) => chief.employee.person.firstName)
-            .join(', '), // Ajustar según la estructura real de la entidad EmployeeChief
-          office.drivers
-            .map((driver) => driver.employee.person.firstName)
-            .join(', '), // Ajustar según la estructura real de la entidad EmployeeDriver
-          office.sellers
-            .map((seller) => seller.employee.person.firstName)
-            .join(', '), // Ajustar según la estructura real de la entidad EmployeeSeller
-          office.isActive ? 'Sí' : 'No',
-          this.formatDate(office.createdAt),
-        ]),
-      };
-
-      // Calcular el ancho de la tabla
-      const availableWidth = doc.page.width - pageMargins * 2;
-      const columnsSize = officeTable.headers.map(
-        () => availableWidth / officeTable.headers.length,
-      );
-
-      // Centrar la tabla en el documento
-      const tableX = pageMargins;
-
-      // Agregar la tabla al informe
-      doc.moveDown();
-      doc.table(officeTable, {
-        x: tableX,
-        columnsSize,
-      });
-
-      // Configuración del pie de página
-      const totalPages = doc.bufferedPageRange().count;
-      for (let i = 0; i < totalPages; i++) {
-        doc.switchToPage(i);
-
-        // Agregar el paginado al final de la página
-        doc
-          .fontSize(10)
-          .text(
-            `Página ${i + 1} de ${totalPages}`,
-            doc.page.width / 2,
-            doc.page.height - pageMargins,
-            { align: 'center' },
-          );
-      }
-
-      // Agregar línea adicional al final del documento
-      doc.moveDown();
-      doc
-        .fontSize(12)
-        .text('Reporte generado por Travely Manager', { align: 'center' });
-
-      const buffer = [];
-      doc.on('data', buffer.push.bind(buffer));
-      doc.on('end', () => {
-        const data = Buffer.concat(buffer);
-        resolve(data);
-      });
-      doc.end();
-    });
-
-    return pdfBuffer;
   }
 
   // Función para formatear la fecha en el formato deseado

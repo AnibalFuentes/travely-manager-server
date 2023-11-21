@@ -1,12 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Employee } from 'src/employees/entities/employee.entity';
-import { Office } from 'src/offices/entities/office.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
   JoinColumn,
-  ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -27,13 +25,6 @@ export class EmployeeDriver {
     type: () => Employee,
   })
   employee: Employee;
-
-  @ManyToOne(() => Office, (office) => office.drivers)
-  @ApiProperty({
-    description: 'Oficina a la que está asignado el conductor.',
-    type: () => Office,
-  })
-  office: Office;
 
   @Column({ type: 'varchar', length: 20, nullable: true })
   @ApiProperty({

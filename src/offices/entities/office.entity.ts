@@ -1,14 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { EmployeeChief } from 'src/employees-chiefs/entities/employees-chief.entity';
-import { EmployeeDriver } from 'src/employees-drivers/entities/employee-driver.entity';
-import { EmployeeSeller } from 'src/employees-sellers/entities/employee-seller.entity';
+
 import { Location } from 'src/locations/entities/location.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -28,6 +26,13 @@ export class Office {
   })
   name: string;
 
+  @Column()
+  @ApiProperty({
+    description: 'Dirección de la oficina',
+    example: '123 Main Street, Cityville',
+  })
+  address: string;
+
   @ManyToOne(() => Location, (location) => location.id, {
     eager: true,
   })
@@ -37,26 +42,14 @@ export class Office {
   })
   location: Location;
 
-  @OneToMany(() => EmployeeChief, (chief) => chief.office)
-  @ApiProperty({
-    description: 'Lista de jefes de empleado asociados a la oficina.',
-    type: () => [EmployeeChief],
+  @ManyToOne(() => EmployeeChief, (employeeChief) => employeeChief.id, {
+    eager: true,
   })
-  chiefs: EmployeeChief[];
-
-  @OneToMany(() => EmployeeDriver, (driver) => driver.office)
   @ApiProperty({
-    description: 'Lista de conductores asociados a la oficina.',
-    type: () => [EmployeeDriver],
+    description: 'El jefe de la oficina.',
+    type: () => Location,
   })
-  drivers: EmployeeDriver[];
-
-  @OneToMany(() => EmployeeSeller, (seller) => seller.office)
-  @ApiProperty({
-    description: 'Lista de vendedores asociados a la oficina.',
-    type: () => [EmployeeSeller],
-  })
-  sellers: EmployeeSeller[];
+  chief: EmployeeChief;
 
   @Column({ type: 'boolean', default: true })
   @ApiProperty({

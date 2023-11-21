@@ -8,6 +8,7 @@ import { PeopleModule } from 'src/people/people.module';
 @Module({
   controllers: [PassengersController],
   providers: [PassengersService],
+  exports: [PassengersService],
   imports: [TypeOrmModule.forFeature([Passenger]), PeopleModule],
 })
 export class PassengersModule {}

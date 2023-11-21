@@ -14,6 +14,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { BrandsService } from 'src/brands/brands.service';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
 import { validate as isUUID } from 'uuid';
+import { VehicleType } from 'src/common/enums/vehicle-type.enum';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const PDFDocument = require('pdfkit-table');
@@ -29,7 +30,8 @@ export class VehiclesService {
   ) {}
 
   async create(createVehicleDto: CreateVehicleDto) {
-    const { brandId, plate, engineNumber, registrationCard } = createVehicleDto;
+    const { brandId, plate, engineNumber, registrationCard, type } =
+      createVehicleDto;
 
     if (!isUUID(brandId, 4)) {
       throw new BadRequestException(
@@ -75,13 +77,32 @@ export class VehiclesService {
       );
     }
 
-    try {
-      const vehicle = this.vehicleRepository.create(createVehicleDto);
-      await this.vehicleRepository.save(vehicle);
-      return vehicle;
-    } catch (error) {
-      this.handleExceptions(error);
+    let numberOfSeats: number;
+    switch (type) {
+      case 'Particular':
+        numberOfSeats = 4;
+        break;
+      case 'Minivan':
+        numberOfSeats = 12;
+        break;
+      case 'Autobus':
+        numberOfSeats = 40;
+        break;
+      default:
+        numberOfSeats = 0;
+        break;
     }
+
+    const newVehicle = this.vehicleRepository.create({
+      brand: brand,
+      plate,
+      engineNumber,
+      registrationCard,
+      type: type as VehicleType,
+      numberOfSeats,
+    });
+
+    return this.vehicleRepository.save(newVehicle);
   }
 
   findAll(paginationDto: PaginationDto) {
@@ -152,17 +173,17 @@ export class VehiclesService {
   }
 
   async update(id: string, updateVehicleDto: UpdateVehicleDto) {
-    const vehicle = await this.vehicleRepository.preload({
-      id: id,
-      ...updateVehicleDto,
-    });
+    const vehicle = await this.vehicleRepository.findOneBy({ id });
 
-    if (!vehicle)
+    if (!vehicle) {
       throw new NotFoundException(`Vehículo con ID ${id} no encontrado`);
+    }
+
+    const updatedVehicle = Object.assign(vehicle, updateVehicleDto);
 
     try {
-      await this.vehicleRepository.save(vehicle);
-      return vehicle;
+      await this.vehicleRepository.save(updatedVehicle);
+      return updatedVehicle;
     } catch (error) {
       this.handleExceptions(error);
     }
