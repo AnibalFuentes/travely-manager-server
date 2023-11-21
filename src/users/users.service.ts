@@ -242,6 +242,10 @@ export class UsersService {
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
   }
 
+  async countActiveUsers(): Promise<number> {
+    return this.userRepository.count({ where: { isActive: true } });
+  }
+
   private handleExceptions(error: any) {
     this.logger.error(error);
 

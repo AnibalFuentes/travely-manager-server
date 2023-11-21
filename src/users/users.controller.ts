@@ -115,6 +115,25 @@ export class UsersController {
   }
 
   /**
+   * @summary Obtener la cantidad de usuarios activos
+   * @description Recupera la cantidad de usuarios activos en el sistema.
+   * @returns Cantidad de usuarios activos recuperada exitosamente.
+   */
+  @Get('active/count')
+  @ApiOperation({
+    summary: 'Obtener la cantidad de usuarios activos',
+    description: 'Recupera la cantidad de usuarios activos en el sistema.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Cantidad de usuarios activos recuperada exitosamente.',
+  })
+  async getActiveUsersCount() {
+    const activeUsersCount = await this.usersService.countActiveUsers();
+    return { activeUsersCount };
+  }
+
+  /**
    * @summary Descargar un informe PDF de usuarios
    * @description Descarga un informe en formato PDF que contiene la información de los usuarios.
    * @param res Respuesta HTTP.
