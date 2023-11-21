@@ -119,6 +119,10 @@ export class OfficesService {
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
   }
 
+  async countActiveOffices(): Promise<number> {
+    return this.officeRepository.count({ where: { isActive: true } });
+  }
+
   private handleExceptions(error: any) {
     this.logger.error(error);
 
