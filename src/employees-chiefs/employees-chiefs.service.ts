@@ -11,6 +11,8 @@ import { Repository } from 'typeorm';
 import { EmployeeChief } from './entities/employees-chief.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
+import { UsersService } from 'src/users/users.service';
+import { User } from 'src/users/entities/user.entity';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const PDFDocument = require('pdfkit-table');
@@ -23,6 +25,7 @@ export class EmployeesChiefsService {
     @InjectRepository(EmployeeChief)
     private readonly employeeChiefRepository: Repository<EmployeeChief>,
     private readonly employeesService: EmployeesService,
+    private readonly usersService: UsersService,
   ) {}
 
   private async getEmployeeChiefById(id: string): Promise<EmployeeChief> {
@@ -45,6 +48,7 @@ export class EmployeesChiefsService {
    */
   async create(createEmployeeChiefDto: CreateEmployeeChiefDto) {
     const createEmployeeDto = createEmployeeChiefDto.employee;
+    const userId = createEmployeeChiefDto.userId;
 
     try {
       const employee = await this.employeesService.create(createEmployeeDto);
@@ -52,6 +56,14 @@ export class EmployeesChiefsService {
       const employeeChief = this.employeeChiefRepository.create({
         employee: employee,
       });
+
+      let user: User;
+      if (userId) {
+        user = await this.usersService.findOne(userId);
+        if (!user) {
+          throw new NotFoundException(`Usuario con ID ${userId} no encontrado`);
+        }
+      }
 
       await this.employeeChiefRepository.save(employeeChief);
       return employeeChief;

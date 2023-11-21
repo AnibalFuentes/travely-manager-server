@@ -30,8 +30,7 @@ export class VehiclesService {
   ) {}
 
   async create(createVehicleDto: CreateVehicleDto) {
-    const { brandId, plate, engineNumber, registrationCard, type } =
-      createVehicleDto;
+    const { brandId, plate, type } = createVehicleDto;
 
     if (!isUUID(brandId, 4)) {
       throw new BadRequestException(
@@ -55,28 +54,6 @@ export class VehiclesService {
       );
     }
 
-    const existingVehicleWithEngineNumber =
-      await this.vehicleRepository.findOne({
-        where: { engineNumber },
-      });
-
-    if (existingVehicleWithEngineNumber) {
-      throw new ConflictException(
-        'Ya existe un vehículo con el mismo número de motor.',
-      );
-    }
-
-    const existingVehicleWithRegistrationCard =
-      await this.vehicleRepository.findOne({
-        where: { registrationCard },
-      });
-
-    if (existingVehicleWithRegistrationCard) {
-      throw new ConflictException(
-        'Ya existe un vehículo con el mismo número de tarjeta de registro.',
-      );
-    }
-
     let numberOfSeats: number;
     switch (type) {
       case 'Particular':
@@ -96,8 +73,6 @@ export class VehiclesService {
     const newVehicle = this.vehicleRepository.create({
       brand: brand,
       plate,
-      engineNumber,
-      registrationCard,
       type: type as VehicleType,
       numberOfSeats,
     });
@@ -148,14 +123,16 @@ export class VehiclesService {
     return vehicles;
   }
 
-  async findVehiclesByModel(model: string) {
-    const vehicles = await this.vehicleRepository.find({ where: { model } });
+  async findVehiclesByReference(reference: string) {
+    const vehicles = await this.vehicleRepository.find({
+      where: { reference: reference },
+    });
     return vehicles;
   }
 
   async findVehiclesByManufacturingYear(year: number) {
     const vehicles = await this.vehicleRepository.find({
-      where: { manufacturingYear: year },
+      where: { model: year },
     });
     return vehicles;
   }
@@ -234,9 +211,9 @@ export class VehiclesService {
         rows: vehicles.map((vehicle, index) => [
           index + 1,
           vehicle.plate,
-          vehicle.model,
+          vehicle.reference,
           vehicle.brand.name,
-          vehicle.manufacturingYear,
+          vehicle.model,
           vehicle.numberOfSeats,
           vehicle.isActive ? 'Sí' : 'No',
           this.formatDate(vehicle.createdAt),

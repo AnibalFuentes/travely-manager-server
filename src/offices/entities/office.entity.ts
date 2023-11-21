@@ -33,8 +33,16 @@ export class Office {
   })
   address: string;
 
+  @Column()
+  @ApiProperty({
+    description: 'Número de contacto de la oficina',
+    example: '+573000001',
+  })
+  numberContact: string;
+
   @ManyToOne(() => Location, (location) => location.id, {
     eager: true,
+    nullable: false,
   })
   @ApiProperty({
     description: 'La ubicación de la oficina.',
@@ -44,6 +52,7 @@ export class Office {
 
   @ManyToOne(() => EmployeeChief, (employeeChief) => employeeChief.id, {
     eager: true,
+    nullable: false,
   })
   @ApiProperty({
     description: 'El jefe de la oficina.',

@@ -1,10 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Employee } from 'src/employees/entities/employee.entity';
+import { User } from 'src/users/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
   JoinColumn,
+  ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -18,9 +20,19 @@ export class EmployeeChief {
   })
   id: string;
 
-  @OneToOne(() => Employee, { cascade: true })
+  @OneToOne(() => Employee, { cascade: true, nullable: false })
   @JoinColumn()
   employee: Employee;
+
+  @ManyToOne(() => User, (user) => user.id, {
+    eager: true,
+    nullable: false,
+  })
+  @ApiProperty({
+    description: 'El usuario asociado al jefe',
+    type: () => User,
+  })
+  user: User;
 
   @Column({ type: 'boolean', default: true })
   @ApiProperty({

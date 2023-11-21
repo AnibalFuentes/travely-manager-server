@@ -20,6 +20,7 @@ export class DriverVehicle {
 
   @ManyToOne(() => Vehicle, (vehicle) => vehicle.id, {
     eager: true,
+    nullable: false,
   })
   @ApiProperty({
     description: 'El vehículo asignado.',
@@ -29,21 +30,13 @@ export class DriverVehicle {
 
   @ManyToOne(() => EmployeeDriver, (employeeDriver) => employeeDriver.id, {
     eager: true,
+    nullable: false,
   })
   @ApiProperty({
     description: 'Primer conductor asignado al vehículo.',
     type: () => EmployeeDriver,
   })
-  driverOne: EmployeeDriver;
-
-  @ManyToOne(() => EmployeeDriver, (employeeDriver) => employeeDriver.id, {
-    eager: true,
-  })
-  @ApiProperty({
-    description: 'Segundo conductor asignado al vehículo.',
-    type: () => EmployeeDriver,
-  })
-  driverTwo: EmployeeDriver | null;
+  driver: EmployeeDriver;
 
   @Column({ type: 'boolean', default: true })
   @ApiProperty({

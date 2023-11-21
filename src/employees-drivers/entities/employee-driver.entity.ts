@@ -18,7 +18,7 @@ export class EmployeeDriver {
   })
   id: string;
 
-  @OneToOne(() => Employee, { cascade: true })
+  @OneToOne(() => Employee, { cascade: true, nullable: false })
   @JoinColumn()
   @ApiProperty({
     description: 'Información del empleado asociado al conductor.',
@@ -26,26 +26,19 @@ export class EmployeeDriver {
   })
   employee: Employee;
 
-  @Column({ type: 'varchar', length: 20, nullable: true })
+  @Column({ type: 'varchar', length: 20, nullable: false })
   @ApiProperty({
     description: 'Número de licencia del conductor.',
     example: 'ABC123456',
   })
   licenseNumber: string;
 
-  @Column({ type: 'date', nullable: true })
+  @Column({ type: 'date', nullable: false })
   @ApiProperty({
     description: 'Fecha de vencimiento de la licencia del conductor.',
     example: '2023-09-29T12:00:00Z',
   })
   licenseExpirationDate: Date;
-
-  @Column({ type: 'boolean', default: true })
-  @ApiProperty({
-    description: 'Indica si la licencia de conducir está activa o no.',
-    example: true,
-  })
-  isLicenseActive: boolean;
 
   @Column({ type: 'boolean', default: true })
   @ApiProperty({

@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { TravelSaleStatus } from 'src/common/enums/travel-sale-status.enum';
 import { DriverVehicle } from 'src/drivers-vehicles/entities/driver-vehicle.entity';
 import { EmployeeOffice } from 'src/employees-offices/entities/employee-office.entity';
 import { Location } from 'src/locations/entities/location.entity';
@@ -25,28 +24,7 @@ export class TravelSale {
     description: 'Total de la venta',
     example: 100.0,
   })
-  total: number;
-
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
-  @ApiProperty({
-    description: 'Monto recibido en la venta',
-    example: 50.0,
-  })
-  amountReceived: number;
-
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
-  @ApiProperty({
-    description: 'Monto redimido en la venta',
-    example: 30.0,
-  })
-  amountRedeemed: number;
-
-  @ApiProperty({
-    example: 'Pagado',
-    description: 'Estado de la venta de viaje',
-  })
-  @Column({ type: 'enum', enum: TravelSaleStatus, nullable: true })
-  status: TravelSaleStatus;
+  price: number;
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   @ApiProperty({
@@ -64,6 +42,7 @@ export class TravelSale {
 
   @ManyToOne(() => Location, (origin) => origin.id, {
     eager: true,
+    nullable: false,
   })
   @ApiProperty({
     description: 'Ubicación de origen del viaje',
@@ -73,6 +52,7 @@ export class TravelSale {
 
   @ManyToOne(() => Location, (destination) => destination.id, {
     eager: true,
+    nullable: false,
   })
   @ApiProperty({
     description: 'Ubicación de destino del viaje',
@@ -82,6 +62,7 @@ export class TravelSale {
 
   @ManyToOne(() => DriverVehicle, (driverVehicle) => driverVehicle.id, {
     eager: true,
+    nullable: false,
   })
   @ApiProperty({
     description: 'Vehículo utilizado en el viaje',
@@ -91,6 +72,7 @@ export class TravelSale {
 
   @ManyToOne(() => EmployeeOffice, (seller) => seller.id, {
     eager: true,
+    nullable: false,
   })
   @ApiProperty({
     description: 'Vendedor',

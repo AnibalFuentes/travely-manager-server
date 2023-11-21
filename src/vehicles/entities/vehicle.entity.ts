@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString } from 'class-validator';
 import { Brand } from 'src/brands/entities/brand.entity';
 import { VehicleType } from 'src/common/enums/vehicle-type.enum';
 import {
@@ -19,13 +18,6 @@ export class Vehicle {
   })
   id: string;
 
-  @Column('varchar', { length: 255, nullable: true, unique: true })
-  @ApiProperty({
-    description: 'Número de la tarjeta de registro del vehículo.',
-    example: 'AB123CD',
-  })
-  registrationCard: string;
-
   @Column('varchar', { length: 6, unique: true })
   @ApiProperty({
     description: 'Número de matrícula del vehículo.',
@@ -38,21 +30,14 @@ export class Vehicle {
     description: 'Nombre del modelo del vehículo.',
     example: 'Transit 2022',
   })
-  model: string;
-
-  @Column('varchar', { length: 255, nullable: true, unique: true })
-  @ApiProperty({
-    description: 'Número de motor del vehículo.',
-    example: 'E123456789CAR4D',
-  })
-  engineNumber: string;
+  reference: string;
 
   @Column('int', { default: 0, nullable: true })
   @ApiProperty({
     description: 'Año de fabricación del vehículo.',
     example: 2020,
   })
-  manufacturingYear: number;
+  model: number;
 
   @Column('int', { default: 0, nullable: true })
   @ApiProperty({
@@ -62,11 +47,12 @@ export class Vehicle {
   numberOfSeats: number;
 
   @ApiProperty({ example: 'Autobus', description: 'tipo de vehículo' })
-  @Column({ type: 'enum', enum: VehicleType, nullable: true })
+  @Column({ type: 'enum', enum: VehicleType, nullable: false })
   type?: VehicleType;
 
   @ManyToOne(() => Brand, (brand) => brand.id, {
     eager: true,
+    nullable: false,
   })
   @ApiProperty({
     description: 'La marca del vehículo.',

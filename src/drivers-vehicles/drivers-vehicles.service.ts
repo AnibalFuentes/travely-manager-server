@@ -29,7 +29,7 @@ export class DriversVehiclesService {
   ) {}
 
   async create(createDriverVehicleDto: CreateDriverVehicleDto) {
-    const { vehicleId, driverOneId, driverTwoId } = createDriverVehicleDto;
+    const { vehicleId, driverId } = createDriverVehicleDto;
 
     if (!isUUID(vehicleId, 4)) {
       throw new BadRequestException(
@@ -43,35 +43,22 @@ export class DriversVehiclesService {
       throw new BadRequestException('El vehículo especificado no existe.');
     }
 
-    if (!isUUID(driverOneId, 4)) {
+    if (!isUUID(driverId, 4)) {
       throw new BadRequestException(
         'Invalid driverOneId. Debe ser un UUID válido.',
       );
     }
 
-    const driverOne = await this.employeesDriversService.findOne(driverOneId);
+    const driver = await this.employeesDriversService.findOne(driverId);
 
-    if (!driverOne) {
-      throw new BadRequestException(
-        'El primer conductor especificado no existe.',
-      );
-    }
-
-    const driverTwo = driverTwoId
-      ? await this.employeesDriversService.findOne(driverTwoId)
-      : null;
-
-    if (driverTwoId && !driverTwo) {
-      throw new BadRequestException(
-        'El segundo conductor especificado no existe.',
-      );
+    if (!driver) {
+      throw new BadRequestException('El conductor especificado no existe.');
     }
 
     try {
       const driverVehicle = this.driverVehicleRepository.create({
         vehicle,
-        driverOne,
-        driverTwo,
+        driver: driver,
         isActive: true,
       });
 
@@ -109,24 +96,14 @@ export class DriversVehiclesService {
       );
     }
 
-    const { driverOneId, driverTwoId } = updateDriverVehicleDto;
+    const { driverId } = updateDriverVehicleDto;
 
-    if (driverOneId) {
-      driverVehicle.driverOne =
-        await this.employeesDriversService.findOne(driverOneId);
-      if (!driverVehicle.driverOne) {
+    if (driverId) {
+      driverVehicle.driver =
+        await this.employeesDriversService.findOne(driverId);
+      if (!driverVehicle.driver) {
         throw new BadRequestException(
           'El primer conductor especificado no existe.',
-        );
-      }
-    }
-
-    if (driverTwoId) {
-      driverVehicle.driverTwo =
-        await this.employeesDriversService.findOne(driverTwoId);
-      if (driverTwoId && !driverVehicle.driverTwo) {
-        throw new BadRequestException(
-          'El segundo conductor especificado no existe.',
         );
       }
     }
@@ -189,21 +166,11 @@ export class DriversVehiclesService {
       // Configuración de la tabla
       const driverVehicleTable = {
         title: 'Tabla de Asignaciones de Vehículos',
-        headers: [
-          'Nº',
-          'Vehículo',
-          'Conductor 1',
-          'Conductor 2',
-          'Activa',
-          'Fecha de Creación',
-        ],
+        headers: ['Nº', 'Vehículo', 'Conductor', 'Activa', 'Fecha de Creación'],
         rows: assignments.map((assignment, index) => [
           index + 1,
-          assignment.vehicle.model, // Ajustar según la estructura real de la entidad Vehicle
-          assignment.driverOne.employee.person.firstName, // Ajustar según la estructura real de la entidad EmployeeDriver y Person
-          assignment.driverTwo
-            ? assignment.driverTwo.employee.person.firstName
-            : '', // Usar el nombre del conductor 2 si existe
+          assignment.vehicle.reference,
+          assignment.driver.employee.person.firstName, // Ajustar según la estructura real de la entidad Vehicle
           assignment.isActive ? 'Sí' : 'No',
           this.formatDate(assignment.createdAt), // Llamar a la función formatDate
         ]),
