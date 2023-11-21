@@ -255,6 +255,25 @@ export class VehiclesController {
   }
 
   /**
+   * @summary Obtener la cantidad de uvehiculos activos
+   * @description Recupera la cantidad de uvehiculos activos en el sistema.
+   * @returns Cantidad de usuarios vehiculos recuperada exitosamente.
+   */
+  @Get('active/count')
+  @ApiOperation({
+    summary: 'Obtener la cantidad de vehiculos activos',
+    description: 'Recupera la cantidad de vehiculos activos en el sistema.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Cantidad de vehiculos activos recuperada exitosamente.',
+  })
+  async getActiveUsersCount() {
+    const activeUsersCount = await this.vehiclesService.countActiveVehicles();
+    return activeUsersCount;
+  }
+
+  /**
    * @summary Descargar un informe PDF de vehículos
    * @description Descarga un informe en formato PDF que contiene la información de los vehículos.
    * @param res Respuesta HTTP.

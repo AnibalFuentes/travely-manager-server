@@ -389,6 +389,36 @@ export class CustomersService {
     return `${company.name} (NIT: ${company.nit}, Dirección: ${company.address})`;
   }
 
+  async countTotalCustomers(): Promise<number> {
+    try {
+      return this.customerRepository.count();
+    } catch (error) {
+      this.handleExceptions(error);
+    }
+  }
+
+  async countTotalPersonCustomers(): Promise<number> {
+    try {
+      return this.customerRepository.count({
+        relations: ['person'],
+        where: { person: Not(IsNull()) },
+      });
+    } catch (error) {
+      this.handleExceptions(error);
+    }
+  }
+
+  async countTotalCompanyCustomers(): Promise<number> {
+    try {
+      return this.customerRepository.count({
+        relations: ['company'],
+        where: { company: Not(IsNull()) },
+      });
+    } catch (error) {
+      this.handleExceptions(error);
+    }
+  }
+
   private formatDate(date: Date): string {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');

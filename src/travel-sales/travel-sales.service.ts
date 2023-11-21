@@ -8,7 +8,7 @@ import {
 import { CreateTravelSaleDto } from './dto/create-travel-sale.dto';
 import { TravelSale } from './entities/travel-sale.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, getManager } from 'typeorm';
 import { LocationsService } from 'src/locations/locations.service';
 import { DriversVehiclesService } from '../drivers-vehicles/drivers-vehicles.service';
 import { EmployeesOfficesService } from '../employees-offices/employees-offices.service';
@@ -141,6 +141,48 @@ export class TravelSalesService {
       take: limit,
       skip: offset,
     });
+  }
+
+  async count(): Promise<number> {
+    return this.travelSaleRepository.count({});
+  }
+
+  /**
+   * @summary Obtener el dinero total pagado de las ventas del día
+   * @description Recupera el dinero total pagado de las ventas del día.
+   * @returns Dinero total pagado de las ventas del día recuperado exitosamente.
+   */
+  async getTotalPaidToday(): Promise<number> {
+    const currentDate = new Date();
+    const startOfDay = new Date(currentDate.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(currentDate.setHours(23, 59, 59, 999));
+
+    const result = await getManager()
+      .createQueryBuilder()
+      .select('SUM(travelSale.price)', 'totalPaidToday')
+      .from(TravelSale, 'travelSale')
+      .where('travelSale.createdAt BETWEEN :startOfDay AND :endOfDay', {
+        startOfDay,
+        endOfDay,
+      })
+      .getRawOne();
+
+    return result.totalPaidToday || 0;
+  }
+
+  /**
+   * @summary Obtener el dinero total pagado de todas las ventas
+   * @description Recupera el dinero total pagado de todas las ventas.
+   * @returns Dinero total pagado de todas las ventas recuperado exitosamente.
+   */
+  async getTotalPaid(): Promise<number> {
+    const result = await getManager()
+      .createQueryBuilder()
+      .select('SUM(travelSale.price)', 'totalPaid')
+      .from(TravelSale, 'travelSale')
+      .getRawOne();
+
+    return result.totalPaid || 0;
   }
 
   private handleExceptions(error: any) {

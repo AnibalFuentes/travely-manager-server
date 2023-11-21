@@ -177,6 +177,10 @@ export class LoginsService {
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
   }
 
+  async countActive(): Promise<number> {
+    return this.loginRepository.count({});
+  }
+
   private handleExceptions(error: any) {
     this.logger.error(error);
 

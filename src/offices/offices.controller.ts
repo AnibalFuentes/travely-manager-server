@@ -135,4 +135,23 @@ export class OfficesController {
   remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.officesService.remove(id);
   }
+
+  /**
+   * @summary Obtener la cantidad de oficinas activas
+   * @description Recupera la cantidad de oficinas activas en el sistema.
+   * @returns Cantidad de oficinas activas recuperada exitosamente.
+   */
+  @Get('active/count')
+  @ApiOperation({
+    summary: 'Obtener la cantidad de oficinas activas',
+    description: 'Recupera la cantidad de oficinas activas en el sistema.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Cantidad de oficinas activas recuperada exitosamente.',
+  })
+  async getActiveCount() {
+    const activeOfficesCount = await this.officesService.countActiveOffices();
+    return activeOfficesCount;
+  }
 }
