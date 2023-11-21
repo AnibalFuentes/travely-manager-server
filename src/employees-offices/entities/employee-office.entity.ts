@@ -6,8 +6,6 @@ import {
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
-  OneToMany,
-  JoinColumn,
   CreateDateColumn,
   Column,
 } from 'typeorm';
@@ -23,6 +21,7 @@ export class EmployeeOffice {
 
   @ManyToOne(() => Employee, (employee) => employee.id, {
     eager: true,
+    nullable: false,
   })
   @ApiProperty({
     description: 'Información relacionada al empleado',
@@ -32,6 +31,7 @@ export class EmployeeOffice {
 
   @ManyToOne(() => Office, (office) => office.id, {
     eager: true,
+    nullable: false,
   })
   @ApiProperty({
     description: 'La oficina a la que está asignado el empleado',
@@ -52,6 +52,7 @@ export class EmployeeOffice {
 
   @ManyToOne(() => User, (user) => user.id, {
     eager: true,
+    nullable: false,
   })
   @ApiProperty({
     description: 'El usuario asociado al empleado de oficina',

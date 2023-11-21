@@ -18,7 +18,7 @@ export class Passenger {
   })
   id: string;
 
-  @OneToOne(() => Person, { cascade: true })
+  @OneToOne(() => Person, { cascade: true, nullable: false })
   @JoinColumn()
   person: Person;
 

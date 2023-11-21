@@ -26,6 +26,13 @@ export class CreateOfficeDto {
   address: string;
 
   @ApiProperty({
+    description: 'Número de contacto de la oficina',
+    example: '+573004593456',
+  })
+  @IsOptional()
+  numberContact: string;
+
+  @ApiProperty({
     description: 'ID de la ubicación asociada a la oficina',
     example: 'e87ef3f1-1f2a-4b6f-b381-4ea3c40b6d3a',
   })

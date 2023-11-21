@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
-  IsBoolean,
   IsDateString,
   IsNotEmpty,
   IsOptional,
@@ -33,13 +32,4 @@ export class CreateEmployeeDriverDto {
   @IsOptional()
   @IsDateString()
   licenseExpirationDate: string;
-
-  @ApiProperty({
-    description: 'Indica si la licencia de conducir está activa o no.',
-    example: true,
-    required: false,
-  })
-  @IsOptional()
-  @IsBoolean()
-  isLicenseActive: boolean;
 }

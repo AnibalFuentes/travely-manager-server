@@ -157,7 +157,7 @@ export class VehiclesController {
   })
   @ApiParam({ name: 'model', description: 'Nombre del modelo del vehículo' })
   findVehiclesByModel(@Param('model') model: string) {
-    return this.vehiclesService.findVehiclesByModel(model);
+    return this.vehiclesService.findVehiclesByReference(model);
   }
 
   /**

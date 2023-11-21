@@ -6,7 +6,6 @@ import {
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
-  Column,
 } from 'typeorm';
 
 @Entity()
@@ -20,6 +19,7 @@ export class PassengerTravelSale {
 
   @ManyToOne(() => Passenger, (passenger) => passenger.id, {
     eager: true,
+    nullable: false,
   })
   @ApiProperty({
     description: 'Pasajero asociado con la venta de viaje',
@@ -29,6 +29,7 @@ export class PassengerTravelSale {
 
   @ManyToOne(() => TravelSale, (travelSale) => travelSale.id, {
     eager: true,
+    nullable: false,
   })
   @ApiProperty({
     description: 'Venta de viaje asociada con el pasajero',

@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsDecimal, IsInt, IsUUID } from 'class-validator';
-import { TravelSaleStatus } from 'src/common/enums/travel-sale-status.enum';
 
 export class CreateTravelSaleDto {
   @ApiProperty({
@@ -23,13 +22,6 @@ export class CreateTravelSaleDto {
   })
   @IsDecimal({ decimal_digits: '1,2' })
   amountRedeemed: number;
-
-  @ApiProperty({
-    description: 'Estado de la venta de viaje',
-    example: 'Pagado',
-  })
-  @IsEnum(TravelSaleStatus)
-  status: TravelSaleStatus;
 
   @ApiProperty({
     description: 'Total de kilómetros en el viaje',
