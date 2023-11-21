@@ -85,6 +85,25 @@ export class LoginsController {
   }
 
   /**
+   * @summary Obtener la cantidad de inicios de sesión
+   * @description Recupera la cantidad de inicios de sesión en el sistema.
+   * @returns Cantidad de inicios de sesión recuperada exitosamente.
+   */
+  @Get('active/count')
+  @ApiOperation({
+    summary: 'Obtener la cantidad de inicios de sesión',
+    description: 'Recupera la cantidad de inicios de sesión en el sistema.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Cantidad de inicios de sesión recuperada exitosamente.',
+  })
+  async getloginsCount() {
+    const loginsCount = await this.loginsService.countActive();
+    return { loginsCount: loginsCount };
+  }
+
+  /**
    * @summary Descargar un informe PDF de inicios de sesión
    * @description Descarga un informe en formato PDF que contiene la información de los inicios de sesión.
    * @param res Respuesta HTTP.
