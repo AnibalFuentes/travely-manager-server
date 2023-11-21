@@ -21,6 +21,7 @@ import { EmployeesOfficesModule } from './employees-offices/employees-offices.mo
 import { DriversVehiclesModule } from './drivers-vehicles/drivers-vehicles.module';
 import { PassengersTravelSalesModule } from './passengers-travel-sales/passengers-travel-sales.module';
 import { TravelSalesModule } from './travel-sales/travel-sales.module';
+import { PaymentsModule } from './payments/payments.module';
 
 @Module({
   imports: [
@@ -55,6 +56,7 @@ import { TravelSalesModule } from './travel-sales/travel-sales.module';
     DriversVehiclesModule,
     PassengersTravelSalesModule,
     TravelSalesModule,
+    PaymentsModule,
   ],
   controllers: [],
   providers: [],
