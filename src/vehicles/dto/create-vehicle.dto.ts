@@ -20,9 +20,9 @@ export class CreateVehicleDto {
     description: 'Referencia del vehículo.',
     example: 'Corolla',
   })
-  @IsOptional()
   @IsString()
-  reference: string;
+  @IsOptional()
+  reference?: string;
 
   @ApiProperty({
     description: 'Nombre del modelo del vehículo.',
