@@ -201,8 +201,6 @@ export class EmployeesChiefsService {
   private handleExceptions(error: any) {
     this.logger.error(error);
 
-    throw new InternalServerErrorException(
-      'Se produjo un error inesperado. Por favor, revise los registros del servidor.',
-    );
+    throw new InternalServerErrorException(error);
   }
 }
