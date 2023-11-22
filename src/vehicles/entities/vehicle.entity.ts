@@ -25,14 +25,14 @@ export class Vehicle {
   })
   plate: string;
 
-  @Column('varchar', { length: 255, nullable: false })
+  @Column('varchar', { length: 255, nullable: true })
   @ApiProperty({
     description: 'Nombre del modelo del vehículo.',
     example: 'Transit 2022',
   })
   reference: string;
 
-  @Column('int', { default: 0, nullable: false })
+  @Column('int', { default: 0, nullable: true })
   @ApiProperty({
     description: 'Año de fabricación del vehículo.',
     example: 2020,
