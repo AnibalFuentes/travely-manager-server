@@ -15,16 +15,16 @@ export class CreateVehicleDto {
     example: 'Corolla',
   })
   @IsString()
-  @IsNotEmpty()
-  reference: string;
+  @IsOptional()
+  reference?: string;
 
   @ApiProperty({
     description: 'Nombre del modelo del vehículo.',
     example: '2022',
   })
   @IsString()
-  @IsNotEmpty()
-  model: string;
+  @IsOptional()
+  model?: string;
 
   @ApiProperty({ example: 'Autobus', description: 'tipo de vehículo' })
   @IsOptional()
