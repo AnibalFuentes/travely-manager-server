@@ -14,7 +14,6 @@ export class CreateVehicleDto {
     description: 'Referencia del vehículo.',
     example: 'Corolla',
   })
-  @IsOptional()
   @IsString()
   @IsNotEmpty()
   reference?: string;
@@ -23,7 +22,6 @@ export class CreateVehicleDto {
     description: 'Nombre del modelo del vehículo.',
     example: '2022',
   })
-  @IsOptional()
   @IsString()
   @IsNotEmpty()
   model?: string;
