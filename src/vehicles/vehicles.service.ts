@@ -30,7 +30,7 @@ export class VehiclesService {
   ) {}
 
   async create(createVehicleDto: CreateVehicleDto) {
-    const { brandId, plate, type } = createVehicleDto;
+    const { brandId, plate, type, reference, model } = createVehicleDto;
 
     if (!isUUID(brandId, 4)) {
       throw new BadRequestException(
@@ -72,6 +72,8 @@ export class VehiclesService {
 
     const newVehicle = this.vehicleRepository.create({
       brand: brand,
+      reference,
+      model,
       plate,
       type: type as VehicleType,
       numberOfSeats,

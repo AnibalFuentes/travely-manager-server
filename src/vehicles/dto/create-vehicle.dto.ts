@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUUID,
+} from 'class-validator';
 
 export class CreateVehicleDto {
   @ApiProperty({
@@ -22,9 +28,9 @@ export class CreateVehicleDto {
     description: 'Nombre del modelo del vehículo.',
     example: '2022',
   })
-  @IsString()
   @IsOptional()
-  model?: string;
+  @IsNumber()
+  model?: number;
 
   @ApiProperty({ example: 'Autobus', description: 'tipo de vehículo' })
   @IsOptional()
