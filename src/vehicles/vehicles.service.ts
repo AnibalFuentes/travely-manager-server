@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { CreateVehicleDto } from './dto/create-vehicle.dto';
 import { UpdateVehicleDto } from './dto/update-vehicle.dto';
-import { Repository } from 'typeorm';
+import { DeepPartial, Repository } from 'typeorm';
 import { Vehicle } from './entities/vehicle.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BrandsService } from 'src/brands/brands.service';
@@ -70,14 +70,14 @@ export class VehiclesService {
         break;
     }
 
-    const newVehicle = this.vehicleRepository.create({
+    const newVehicle: DeepPartial<Vehicle> = {
       brand: brand,
       reference,
-      model,
+      model: model ? parseInt(model, 10) : 0,
       plate,
       type: type as VehicleType,
       numberOfSeats,
-    });
+    };
 
     return this.vehicleRepository.save(newVehicle);
   }
