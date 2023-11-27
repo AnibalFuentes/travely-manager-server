@@ -1,6 +1,6 @@
 import {
+  BadRequestException,
   Injectable,
-  InternalServerErrorException,
   Logger,
   NotFoundException,
 } from '@nestjs/common';
@@ -12,8 +12,9 @@ import { EmployeeChief } from './entities/employees-chief.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
 import { UsersService } from 'src/users/users.service';
-import { User } from 'src/users/entities/user.entity';
-
+import { validate as isUUID } from 'uuid';
+import { Employee } from 'src/employees/entities/employee.entity';
+import { CreateEmployeeDto } from 'src/employees/dto/create-employee.dto';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const PDFDocument = require('pdfkit-table');
 
@@ -47,29 +48,30 @@ export class EmployeesChiefsService {
    * @throws InternalServerErrorException Si ocurre un error inesperado.
    */
   async create(createEmployeeChiefDto: CreateEmployeeChiefDto) {
-    const createEmployeeDto = createEmployeeChiefDto.employee;
-    const userId = createEmployeeChiefDto.userId;
+    const { userId, employee: createEmployeeDto } = createEmployeeChiefDto;
 
-    try {
-      const employee = await this.employeesService.create(createEmployeeDto);
-
-      const employeeChief = this.employeeChiefRepository.create({
-        employee: employee,
-      });
-
-      let user: User;
-      if (userId) {
-        user = await this.usersService.findOne(userId);
-        if (!user) {
-          throw new NotFoundException(`Usuario con ID ${userId} no encontrado`);
-        }
-      }
-
-      await this.employeeChiefRepository.save(employeeChief);
-      return employeeChief;
-    } catch (error) {
-      this.handleExceptions(error);
+    if (!isUUID(userId, 4)) {
+      throw new BadRequestException('Invalid userId. Debe ser un UUID válido.');
     }
+
+    const user = await this.usersService.findOne(userId);
+
+    if (!user) {
+      throw new BadRequestException('El usuario especificado no existe.');
+    }
+
+    let createEmployee;
+    if (createEmployeeDto) {
+      createEmployee = await this.employeesService.create(createEmployeeDto);
+    }
+
+    const employeeChief = this.employeeChiefRepository.create({
+      employee: createEmployee,
+      user,
+      isActive: true, // Puedes ajustar esto según tus necesidades
+    });
+
+    return await this.employeeChiefRepository.save(employeeChief);
   }
 
   /**
@@ -200,7 +202,5 @@ export class EmployeesChiefsService {
 
   private handleExceptions(error: any) {
     this.logger.error(error);
-
-    throw new InternalServerErrorException(error);
   }
 }
