@@ -90,7 +90,7 @@ export class EmployeesChiefsService {
 
     const [employeeChiefs, total] =
       await this.employeeChiefRepository.findAndCount({
-        relations: ['employee'],
+        relations: ['employee', 'employee.person'],
         take: limit,
         skip: offset,
       });
